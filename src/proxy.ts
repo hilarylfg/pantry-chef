@@ -1,0 +1,25 @@
+import { type NextRequest, NextResponse } from 'next/server'
+
+export default function proxy(request: NextRequest) {
+	const { url, cookies } = request
+
+	const session = cookies.get('pantry.sid')?.value
+
+	const isAuthPage = url.includes('/auth')
+
+	if (isAuthPage) {
+		if (session) {
+			return NextResponse.redirect(new URL('/', url))
+		}
+
+		return NextResponse.next()
+	}
+
+	if (!session) {
+		return NextResponse.redirect(new URL('/auth', url))
+	}
+}
+
+export const config = {
+	matcher: ['/((?!auth|api|_next/static|_next/image|favicon.ico).*)']
+}

@@ -1,0 +1,243 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =========================================================================
+   PantryChef — тёплая кухонная дизайн-система.
+   Структурная дисциплина shadcn (воздух, сетка, фокус-ринги) + тёплая
+   мандариново-карамельная палитра поверх кремового / тёплого угля.
+   Все цвета — только OKLch-токены. Никакого «чистого» белого/чёрного.
+   ========================================================================= */
+
+@theme inline {
+    /* шрифты (пробрасываются из next/font в layout: --font-sans, --font-mono) */
+    --font-heading: var(--font-sans);
+    --font-sans: var(--font-sans);
+    --font-mono: var(--font-mono);
+
+    /* доменные токены свежести продуктов — экспонируем как tailwind-классы */
+    --color-fresh: var(--fresh);
+    --color-soon: var(--soon);
+    --color-late: var(--late);
+    --color-cream: var(--cream);
+    --color-coal: var(--coal);
+    --color-coal-deep: var(--coal-deep);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+
+    /* стандартный shadcn-маппинг токенов → tailwind-классов */
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+
+    /* радиусы — шкала shadcn от базового --radius (=14px, тёплый md из системы) */
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+    /* ── светлая: молоко, ваниль, крем ──────────────────────────────────── */
+
+    /* базовые поверхности shadcn ← тёплая система прототипа */
+    --background: oklch(0.965 0.012 86);            /* страница — тёплый кремовый */
+    --foreground: oklch(0.29 0.015 55);             /* текст — тёплый эспрессо */
+    --surface: oklch(0.987 0.006 90);               /* карточки, приподнятые слои */
+    --card: var(--surface);                         /* shadcn-алиас поверхности */
+    --card-foreground: oklch(0.29 0.015 55);
+    --popover: oklch(0.987 0.006 90);
+    --popover-foreground: oklch(0.29 0.015 55);
+
+    /* мандарин — основной цвет действия (btn-primary в прототипе) */
+    --primary: oklch(0.68 0.145 50);
+    --primary-foreground: oklch(0.99 0.006 90);
+    --accent-on: oklch(0.99 0.006 90);              /* текст на акценте (алиас прототипа) */
+
+    /* вторичный / приглушённый фон ← мягкий оттенённый фон (чипы, шапки) */
+    --secondary: oklch(0.948 0.016 80);
+    --secondary-foreground: oklch(0.29 0.015 55);
+    --muted: oklch(0.948 0.016 80);
+    --muted-foreground: oklch(0.57 0.013 68);       /* подписи, метаданные */
+    --accent: oklch(0.948 0.016 80);
+    --accent-foreground: oklch(0.29 0.015 55);
+
+    /* портится — мягкая терракота как деструктивный */
+    --destructive: oklch(0.6 0.16 25);
+
+    /* волосок и поля ввода */
+    --border: oklch(0.9 0.014 82);
+    --input: oklch(0.9 0.014 82);
+    --ring: oklch(0.68 0.145 50);                   /* фокус-ринг — мандарин */
+
+    /* доменные токены свежести продуктов */
+    --fresh: oklch(0.6 0.13 145);                    /* свежо — мягкая зелень */
+    --soon: oklch(0.72 0.15 72);                     /* скоро — тёплый янтарь */
+    --late: oklch(0.6 0.16 25);                      /* портится — мягкая терракота */
+
+    /* системные алиасы палитры (для кастомных компонентов дизайн-системы) */
+    --cream: oklch(0.985 0.006 90);                  /* тёплый почти-белый */
+    --coal: oklch(0.22 0.02 52);                     /* тёплый почти-чёрный */
+    --coal-deep: oklch(0.13 0.018 48);               /* глубокий уголь — камера/фото */
+    --surface-2: oklch(0.948 0.016 80);              /* мягкий оттенённый фон */
+
+    /* радиус-база = 14px (md из системы), шкала shadpx считается выше */
+    --radius: 0.875rem;
+
+    /* чарт-палитра — тёплые пищевые тона */
+    --chart-1: oklch(0.68 0.145 50);
+    --chart-2: oklch(0.6 0.13 145);
+    --chart-3: oklch(0.72 0.15 72);
+    --chart-4: oklch(0.6 0.16 25);
+    --chart-5: oklch(0.57 0.013 68);
+
+    /* sidebar зеркалит основную палитру */
+    --sidebar: oklch(0.987 0.006 90);
+    --sidebar-foreground: oklch(0.29 0.015 55);
+    --sidebar-primary: oklch(0.68 0.145 50);
+    --sidebar-primary-foreground: oklch(0.99 0.006 90);
+    --sidebar-accent: oklch(0.948 0.016 80);
+    --sidebar-accent-foreground: oklch(0.29 0.015 55);
+    --sidebar-border: oklch(0.9 0.014 82);
+    --sidebar-ring: oklch(0.68 0.145 50);
+
+    /* тени / ring / плавность — как в прототипе, на тёплом fg */
+    --shadow-sm: 0 1px 2px color-mix(in oklab, var(--foreground), transparent 94%);
+    --shadow-md: 0 6px 18px -8px color-mix(in oklab, var(--foreground), transparent 78%),
+                 0 1px 3px color-mix(in oklab, var(--foreground), transparent 90%);
+    --shadow-lg: 0 22px 48px -16px color-mix(in oklab, var(--foreground), transparent 72%);
+    --focus-ring: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-theme="dark"] {
+    /* ── тёмная: тёплый уголь, как прожаренная корочка ───────────────────── */
+
+    --background: oklch(0.255 0.012 56);
+    --foreground: oklch(0.945 0.013 84);
+    --surface: oklch(0.302 0.014 60);
+    --card: var(--surface);
+    --card-foreground: oklch(0.945 0.013 84);
+    --popover: oklch(0.302 0.014 60);
+    --popover-foreground: oklch(0.945 0.013 84);
+
+    --primary: oklch(0.75 0.15 53);
+    --primary-foreground: oklch(0.21 0.025 55);
+    --accent-on: oklch(0.21 0.025 55);              /* текст на акценте (алиас прототипа) */
+
+    --secondary: oklch(0.348 0.016 58);
+    --secondary-foreground: oklch(0.945 0.013 84);
+    --muted: oklch(0.348 0.016 58);
+    --muted-foreground: oklch(0.72 0.016 74);
+    --accent: oklch(0.348 0.016 58);
+    --accent-foreground: oklch(0.945 0.013 84);
+
+    --destructive: oklch(0.69 0.16 27);
+
+    --border: oklch(0.37 0.014 62);
+    --input: oklch(0.37 0.014 62);
+    --ring: oklch(0.75 0.15 53);
+
+    --fresh: oklch(0.7 0.14 145);
+    --soon: oklch(0.82 0.14 74);
+    --late: oklch(0.69 0.16 27);
+
+    --cream: oklch(0.945 0.01 84);
+    --coal: oklch(0.19 0.018 52);
+    --coal-deep: oklch(0.12 0.016 48);
+    --surface-2: oklch(0.348 0.016 58);
+
+    --chart-1: oklch(0.75 0.15 53);
+    --chart-2: oklch(0.7 0.14 145);
+    --chart-3: oklch(0.82 0.14 74);
+    --chart-4: oklch(0.69 0.16 27);
+    --chart-5: oklch(0.72 0.016 74);
+
+    --sidebar: oklch(0.302 0.014 60);
+    --sidebar-foreground: oklch(0.945 0.013 84);
+    --sidebar-primary: oklch(0.75 0.15 53);
+    --sidebar-primary-foreground: oklch(0.21 0.025 55);
+    --sidebar-accent: oklch(0.348 0.016 58);
+    --sidebar-accent-foreground: oklch(0.945 0.013 84);
+    --sidebar-border: oklch(0.37 0.014 62);
+    --sidebar-ring: oklch(0.75 0.15 53);
+
+    --shadow-sm: 0 1px 2px color-mix(in oklab, var(--coal), transparent 70%);
+    --shadow-md: 0 6px 18px -8px color-mix(in oklab, var(--coal), transparent 45%),
+                 0 1px 3px color-mix(in oklab, var(--coal), transparent 60%);
+    --shadow-lg: 0 22px 48px -16px color-mix(in oklab, var(--coal), transparent 40%);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    html {
+        @apply font-sans;
+        -webkit-text-size-adjust: 100%;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        text-wrap: pretty;
+    }
+
+    h1, h2, h3, h4 {
+        text-wrap: balance;
+    }
+
+    ::selection {
+        background: color-mix(in oklab, var(--primary), transparent 70%);
+    }
+
+    :focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
