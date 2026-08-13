@@ -1,52 +1,59 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { type ReactElement } from 'react'
 import { FaApple, FaGoogle, FaYandex } from 'react-icons/fa'
 
-import { useOauthMutation } from '@/features/auth/oauth/model/use-oauth-mutation'
+import { type OAuthProvider, useOauthMutation } from '@/features/auth'
 import { Button } from '@/shared'
 
-export function OAuthButtons() {
+const OAUTH_PROVIDERS: ReadonlyArray<{
+	provider: OAuthProvider
+	icon: ReactElement
+}> = [
+	{ provider: 'google', icon: <FaGoogle className='size-5' /> },
+	{ provider: 'apple', icon: <FaApple className='size-5' /> },
+	{ provider: 'yandex', icon: <FaYandex className='size-5' /> }
+]
+
+const PROVIDER_BUTTON_LABELS: Readonly<Record<OAuthProvider, string>> = {
+	google: 'Register with Google',
+	apple: 'Register with Apple',
+	yandex: 'Register with Yandex'
+}
+
+export function OAuthButtons(): ReactElement {
 	const router = useRouter()
 	const { oauth, isLoading } = useOauthMutation()
 
-	const onClick = async (provider: 'google' | 'yandex' | 'apple') => {
-		const response = await oauth(provider)
+	const onClick = async (provider: OAuthProvider): Promise<void> => {
+		try {
+			const response = await oauth(provider)
 
-		if (response) {
-			router.push(response.url)
+			if (response) {
+				router.push(response.url)
+			}
+		} catch {
+			// Error toast is surfaced by the mutation's onError handler.
 		}
 	}
 
 	return (
 		<div className='grid grid-cols-3 gap-4 my-6'>
-			<Button
-				variant='outline'
-				className='w-full h-10'
-				disabled={isLoading}
-				onClick={() => onClick('google')}
-			>
-				<FaGoogle className='size-5' />
-				<span className='sr-only'>Register with Google</span>
-			</Button>
-			<Button
-				variant='outline'
-				className='w-full h-10'
-				disabled={isLoading}
-				onClick={() => onClick('apple')}
-			>
-				<FaApple className='size-5' />
-				<span className='sr-only'>Register with Apple</span>
-			</Button>
-			<Button
-				variant='outline'
-				className='w-full h-10'
-				disabled={isLoading}
-				onClick={() => onClick('yandex')}
-			>
-				<FaYandex className='size-5' />
-				<span className='sr-only'>Register with Yandex</span>
-			</Button>
+			{OAUTH_PROVIDERS.map(({ provider, icon }) => (
+				<Button
+					key={provider}
+					variant='outline'
+					className='w-full h-10'
+					disabled={isLoading}
+					onClick={() => onClick(provider)}
+				>
+					{icon}
+					<span className='sr-only'>
+						{PROVIDER_BUTTON_LABELS[provider]}
+					</span>
+				</Button>
+			))}
 		</div>
 	)
 }

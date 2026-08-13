@@ -1,10 +1,12 @@
 import { z } from 'zod'
 
+import { OTP_LENGTH, OTP_REGEX } from '@/shared'
+
 export const TwoFactorSchema = z.object({
 	code: z
 		.string()
-		.length(6, { message: 'Код из 6 цифр' })
-		.regex(/^\d{6}$/, { message: 'Только цифры' })
+		.length(OTP_LENGTH, { message: `Код из ${OTP_LENGTH} цифр` })
+		.regex(OTP_REGEX, { message: 'Только цифры' })
 })
 
 export type TypeTwoFactorSchema = z.infer<typeof TwoFactorSchema>

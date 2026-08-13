@@ -1,8 +1,10 @@
 import { z } from 'zod'
 
+import { emailField, passwordField } from '@/shared'
+
 export const LoginSchema = z.object({
-	email: z.string().email({ message: 'Некорректная почта' }),
-	password: z.string().min(6, { message: 'Пароль минимум 6 символов' }),
+	email: emailField,
+	password: passwordField,
 	code: z.optional(z.string())
 })
 

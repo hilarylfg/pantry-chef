@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { type ReactElement } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
@@ -15,10 +16,10 @@ import {
 	Field,
 	FieldError,
 	FieldLabel,
-	Input
+	TextField
 } from '@/shared'
 
-export function SignupForm() {
+export function SignupForm(): ReactElement {
 	const form = useForm<TypeSignupSchema>({
 		resolver: zodResolver(SignupSchema),
 		defaultValues: { name: '', email: '', password: '' }
@@ -26,7 +27,7 @@ export function SignupForm() {
 
 	const { signup, isLoadingSignup } = useSignupMutation()
 
-	const onSubmit = (values: TypeSignupSchema) => {
+	const onSubmit = (values: TypeSignupSchema): void => {
 		signup(values)
 	}
 
@@ -35,70 +36,29 @@ export function SignupForm() {
 			className='flex flex-col gap-5'
 			onSubmit={form.handleSubmit(onSubmit)}
 		>
-			<Controller
+			<TextField
 				name='name'
 				control={form.control}
-				render={({ field, fieldState }) => (
-					<Field data-invalid={fieldState.invalid}>
-						<FieldLabel htmlFor='name'>Имя</FieldLabel>
-						<Input
-							id='name'
-							type='name'
-							className='text-[15px]'
-							placeholder='Иван'
-							aria-invalid={fieldState.invalid}
-							required
-							{...field}
-						/>
-						{fieldState.invalid && (
-							<FieldError errors={[fieldState.error]} />
-						)}
-					</Field>
-				)}
+				label='Имя'
+				placeholder='Иван'
+				required
 			/>
-			<Controller
+			<TextField
 				name='email'
 				control={form.control}
-				render={({ field, fieldState }) => (
-					<Field data-invalid={fieldState.invalid}>
-						<FieldLabel htmlFor='email'>Почта</FieldLabel>
-						<Input
-							id='email'
-							type='email'
-							className='text-[15px]'
-							placeholder='m@example.com'
-							disabled={isLoadingSignup}
-							aria-invalid={fieldState.invalid}
-							required
-							{...field}
-						/>
-						{fieldState.invalid && (
-							<FieldError errors={[fieldState.error]} />
-						)}
-					</Field>
-				)}
+				label='Почта'
+				type='email'
+				placeholder='m@example.com'
+				disabled={isLoadingSignup}
+				required
 			/>
-
-			<Controller
+			<TextField
 				name='password'
 				control={form.control}
-				render={({ field, fieldState }) => (
-					<Field data-invalid={fieldState.invalid}>
-						<FieldLabel htmlFor='password'>Пароль</FieldLabel>
-						<Input
-							id='password'
-							type='password'
-							className='text-[15px]'
-							aria-invalid={fieldState.invalid}
-							disabled={isLoadingSignup}
-							required
-							{...field}
-						/>
-						{fieldState.invalid && (
-							<FieldError errors={[fieldState.error]} />
-						)}
-					</Field>
-				)}
+				label='Пароль'
+				type='password'
+				disabled={isLoadingSignup}
+				required
 			/>
 			<Controller
 				name='acceptTerms'
@@ -110,12 +70,12 @@ export function SignupForm() {
 						data-invalid={fieldState.invalid}
 					>
 						<Checkbox
-								id='signup-terms'
-								name='signup-terms'
-								checked={field.value}
-								onCheckedChange={field.onChange}
-								aria-invalid={fieldState.invalid}
-							/>
+							id='signup-terms'
+							name='signup-terms'
+							checked={field.value}
+							onCheckedChange={field.onChange}
+							aria-invalid={fieldState.invalid}
+						/>
 						<FieldLabel
 							className='text-[13px] gap-1'
 							htmlFor='signup-terms'

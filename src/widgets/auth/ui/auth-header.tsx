@@ -1,8 +1,9 @@
 import { ArrowLeftIcon } from 'lucide-react'
+import { type ReactElement } from 'react'
 
 import { Button } from '@/shared'
 
-export function AuthHeader() {
+export function AuthHeader(): ReactElement {
 	return (
 		<div className='flex items-center justify-between'>
 			<Button size='icon-lg'>

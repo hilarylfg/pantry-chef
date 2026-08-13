@@ -1,12 +1,12 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { type ReactElement, useEffect } from 'react'
 
-import { useVerificationMutation } from '@/features/auth'
-import { Spinner, toast } from '@/shared'
+import { AUTH_MESSAGES, useVerificationMutation } from '@/features/auth'
+import { HOME_PATH, Spinner, toast } from '@/shared'
 
-export function EmailVerifyPage() {
+export function EmailVerifyPage(): ReactElement {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const token = searchParams?.get('token')
@@ -17,11 +17,12 @@ export function EmailVerifyPage() {
 		if (!token) {
 			toast.add({
 				type: 'error',
-				title: 'Ссылка повреждена, проверьте ссылку'
+				title: AUTH_MESSAGES.brokenLink
 			})
-			router.push('/')
+			router.push(HOME_PATH)
 			return
 		}
+
 		verification(token)
 	}, [router, token, verification])
 

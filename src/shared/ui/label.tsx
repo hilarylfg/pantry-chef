@@ -2,9 +2,12 @@
 
 import * as React from 'react'
 
-import { cn } from '@/shared'
+import { cn } from '../lib/clsx'
 
-function Label({ className, ...props }: React.ComponentProps<'label'>) {
+function Label({
+	className,
+	...props
+}: React.ComponentProps<'label'>): React.ReactElement {
 	return (
 		<label
 			data-slot='label'

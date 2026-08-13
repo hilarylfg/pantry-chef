@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react'
 
-import { AuthStep } from '@/widgets/auth'
+import type { AuthStep } from './auth.types'
 
 export interface AuthFlowApi {
 	mode: AuthStep
@@ -12,8 +12,12 @@ export interface AuthFlowApi {
 
 export const FlowContext = createContext<AuthFlowApi | null>(null)
 
-export function useAuthFlow() {
+export function useAuthFlow(): AuthFlowApi {
 	const ctx = useContext(FlowContext)
-	if (!ctx) throw new Error('useFlow must be used inside <AuthFlowProvider>')
+
+	if (!ctx) {
+		throw new Error('useAuthFlow must be used inside <AuthFlowProvider>')
+	}
+
 	return ctx
 }

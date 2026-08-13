@@ -1,6 +1,8 @@
-import { EmailVerifyPage } from '@/pages/email-verify-page'
+import type { ReactElement } from 'react'
 
-export default function SignupPage() {
+import { EmailVerifyPage } from '@/features/auth'
+
+export default function VerifyPage(): ReactElement {
 	return (
 		<div className='flex h-svh flex-col items-center bg-background p-6 md:p-10'>
 			<EmailVerifyPage />

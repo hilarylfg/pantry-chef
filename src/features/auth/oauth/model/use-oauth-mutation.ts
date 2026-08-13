@@ -1,12 +1,27 @@
+'use client'
+
 import { useMutation } from '@tanstack/react-query'
 
-import { oauthService } from '@/features/auth'
+import {
+	AUTH_MUTATION_KEYS,
+	type OAuthProvider,
+	oauthService
+} from '@/features/auth'
+import { toastMessageHandler } from '@/shared'
 
-export function useOauthMutation() {
-	const { mutateAsync: oauth, isPending: isLoading } = useMutation({
-		mutationKey: ['oauth by provider'],
-		mutationFn: async (provider: 'google' | 'yandex' | 'apple') =>
-			await oauthService.oauthByProvider(provider)
+export function useOauthMutation(): {
+	oauth: (provider: OAuthProvider) => Promise<{ url: string }>
+	isLoading: boolean
+} {
+	const { mutateAsync: oauth, isPending: isLoading } = useMutation<
+		{ url: string },
+		Error,
+		OAuthProvider
+	>({
+		mutationKey: AUTH_MUTATION_KEYS.oauth,
+		mutationFn: async (provider: OAuthProvider) =>
+			await oauthService.oauthByProvider(provider),
+		onError: toastMessageHandler
 	})
 
 	return { oauth, isLoading }

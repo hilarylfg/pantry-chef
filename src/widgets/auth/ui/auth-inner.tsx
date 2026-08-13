@@ -1,19 +1,21 @@
-import { cn } from '@/shared'
-import { AuthStep, useAuthFlow } from '@/widgets/auth'
+import { type ReactElement } from 'react'
 
-const TITLES: Record<AuthStep, string> = {
+import { type AuthStep, useAuthFlow } from '@/features/auth'
+import { cn } from '@/shared'
+
+const TITLES: Readonly<Record<AuthStep, string>> = {
 	login: 'С возвращением',
 	signup: 'Создать аккаунт',
 	'2fa': 'Введите код'
 }
 
-const SUBTITLES: Record<AuthStep, string> = {
+const SUBTITLES: Readonly<Record<AuthStep, string>> = {
 	login: 'Войдите, чтобы продолжить готовить',
 	signup: 'Это бесплатно — навсегда. Рецепты, план и покупки под рукой.',
 	'2fa': 'Введите 6-значный код, отправленный на вашу почту'
 }
 
-export function AuthInner() {
+export function AuthInner(): ReactElement {
 	const { mode } = useAuthFlow()
 
 	return (

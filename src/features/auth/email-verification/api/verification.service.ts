@@ -1,8 +1,9 @@
+import { AUTH_ENDPOINTS } from '@/features/auth'
 import { api } from '@/shared'
 
 class VerificationService {
-	public async newVerification(token: string | null) {
-		return await api.post('auth/email-confirmation', { token })
+	public async newVerification(token: string | null): Promise<void> {
+		await api.post(AUTH_ENDPOINTS.emailConfirmation, { token })
 	}
 }
 

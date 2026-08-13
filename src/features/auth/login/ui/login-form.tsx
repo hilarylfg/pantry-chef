@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useState } from 'react'
+import { type ReactElement, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { LoginSchema, TypeLoginSchema, useLoginMutation } from '@/features/auth'
@@ -12,7 +12,8 @@ import {
 	Field,
 	FieldError,
 	FieldLabel,
-	Input
+	Input,
+	TextField
 } from '@/shared'
 
 export function LoginForm() {
@@ -24,7 +25,7 @@ export function LoginForm() {
 
 	const { login, isLoadingLogin } = useLoginMutation()
 
-	const onSubmit = (values: TypeLoginSchema) => {
+	const onSubmit = (values: TypeLoginSchema): void => {
 		login(values)
 	}
 
@@ -33,27 +34,14 @@ export function LoginForm() {
 			className='flex flex-col gap-5'
 			onSubmit={form.handleSubmit(onSubmit)}
 		>
-			<Controller
+			<TextField
 				name='email'
 				control={form.control}
-				render={({ field, fieldState }) => (
-					<Field data-invalid={fieldState.invalid}>
-						<FieldLabel htmlFor='email'>Почта</FieldLabel>
-						<Input
-							id='email'
-							type='email'
-							className='text-[15px]'
-							placeholder='m@example.com'
-							disabled={isLoadingLogin}
-							aria-invalid={fieldState.invalid}
-							required
-							{...field}
-						/>
-						{fieldState.invalid && (
-							<FieldError errors={[fieldState.error]} />
-						)}
-					</Field>
-				)}
+				label='Почта'
+				type='email'
+				placeholder='m@example.com'
+				disabled={isLoadingLogin}
+				required
 			/>
 
 			<Controller
@@ -69,14 +57,14 @@ export function LoginForm() {
 								aria-invalid={fieldState.invalid}
 								type={showPassword ? 'text' : 'password'}
 								placeholder='••••••••'
-                                autoComplete='current-password'
-                                disabled={isLoadingLogin}
+								autoComplete='current-password'
+								disabled={isLoadingLogin}
 								required
 								{...field}
 							/>
 							<button
 								type='button'
-								onClick={() => setShowPassword(s => !s)}
+								onClick={() => setShowPassword(show => !show)}
 								className='absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground'
 								aria-label={
 									showPassword

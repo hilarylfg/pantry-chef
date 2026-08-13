@@ -1,4 +1,7 @@
-import { FetchError, RequestOptions, TypeSearchParams } from '@/shared'
+import { FetchError } from './fetch-error'
+import type { RequestOptions, TypeSearchParams } from './fetch-types'
+
+const JSON_CONTENT_TYPE: string = 'application/json'
 
 export class FetchClient {
 	private readonly baseUrl: string
@@ -18,7 +21,7 @@ export class FetchClient {
 		this.options = init.options
 	}
 
-	private createSearchParams(params: TypeSearchParams) {
+	private createSearchParams(params: TypeSearchParams): string {
 		const searchParams = new URLSearchParams()
 
 		for (const key in { ...this.params, ...params }) {
@@ -40,11 +43,36 @@ export class FetchClient {
 		return `?${searchParams.toString()}`
 	}
 
+	private async parseErrorResponse(response: Response): Promise<string> {
+		try {
+			const error = (await response.json()) as
+				{ message?: string } | undefined
+
+			return error?.message || response.statusText
+		} catch {
+			return response.statusText
+		}
+	}
+
+	private buildJsonConfig(
+		body: Record<string, unknown> | undefined,
+		options: RequestOptions
+	): RequestOptions {
+		return {
+			...options,
+			headers: {
+				'Content-Type': JSON_CONTENT_TYPE,
+				...(options?.headers || {})
+			},
+			...(!!body && { body: JSON.stringify(body) })
+		}
+	}
+
 	private async request<T>(
 		endpoint: string,
 		method: RequestInit['method'],
 		options: RequestOptions = {}
-	) {
+	): Promise<T> {
 		let url = `${this.baseUrl}/${endpoint}`
 
 		if (options.params) {
@@ -64,79 +92,66 @@ export class FetchClient {
 		const response: Response = await fetch(url, config)
 
 		if (!response.ok) {
-			const error = (await response.json()) as
-				{ message: string } | undefined
 			throw new FetchError(
 				response.status,
-				error?.message || response.statusText
+				await this.parseErrorResponse(response)
 			)
 		}
 
-		if (
-			response.headers.get('Content-Type')?.includes('application/json')
-		) {
+		if (response.headers.get('Content-Type')?.includes(JSON_CONTENT_TYPE)) {
 			return (await response.json()) as unknown as T
-		} else {
-			return (await response.text()) as unknown as T
 		}
+
+		return (await response.text()) as unknown as T
 	}
 
 	public get<T>(
 		endpoint: string,
 		options: Omit<RequestOptions, 'body'> = {}
-	) {
+	): Promise<T> {
 		return this.request<T>(endpoint, 'GET', options)
 	}
 
 	public post<T>(
 		endpoint: string,
-		body?: Record<string, any>,
+		body?: Record<string, unknown>,
 		options: RequestOptions = {}
-	) {
-		return this.request<T>(endpoint, 'POST', {
-			...options,
-			headers: {
-				'Content-Type': 'application/json',
-				...(options?.headers || {})
-			},
-			...(!!body && { body: JSON.stringify(body) })
-		})
+	): Promise<T> {
+		return this.request<T>(
+			endpoint,
+			'POST',
+			this.buildJsonConfig(body, options)
+		)
 	}
 
 	public put<T>(
 		endpoint: string,
-		body?: Record<string, any>,
+		body?: Record<string, unknown>,
 		options: RequestOptions = {}
-	) {
-		return this.request<T>(endpoint, 'PUT', {
-			...options,
-			headers: {
-				'Content-Type': 'application/json',
-				...(options?.headers || {})
-			},
-			...(!!body && { body: JSON.stringify(body) })
-		})
+	): Promise<T> {
+		return this.request<T>(
+			endpoint,
+			'PUT',
+			this.buildJsonConfig(body, options)
+		)
 	}
 
 	public delete<T>(
 		endpoint: string,
 		options: Omit<RequestOptions, 'body'> = {}
-	) {
+	): Promise<T> {
 		return this.request<T>(endpoint, 'DELETE', options)
 	}
 
 	public patch<T>(
 		endpoint: string,
-		body?: Record<string, any>,
+		body?: Record<string, unknown>,
 		options: RequestOptions = {}
-	) {
-		return this.request<T>(endpoint, 'PATCH', {
-			...options,
-			headers: {
-				'Content-Type': 'application/json',
-				...(options?.headers || {})
-			},
-			...(!!body && { body: JSON.stringify(body) })
-		})
+	): Promise<T> {
+		return this.request<T>(
+			endpoint,
+			'PATCH',
+			this.buildJsonConfig(body, options)
+		)
 	}
 }

@@ -1,7 +1,8 @@
-import { OAuthButtons } from '@/features/auth'
-import { AuthStep, useAuthFlow } from '@/widgets/auth'
+import { type ReactElement } from 'react'
 
-export function AuthFooter() {
+import { type AuthStep, OAuthButtons, useAuthFlow } from '@/features/auth'
+
+export function AuthFooter(): ReactElement {
 	const { switchTo, mode } = useAuthFlow()
 
 	const nextMode: AuthStep = mode === 'login' ? 'signup' : 'login'

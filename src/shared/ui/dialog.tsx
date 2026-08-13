@@ -4,28 +4,36 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { XIcon } from 'lucide-react'
 import * as React from 'react'
 
-import { Button, cn } from '@/shared'
+import { cn } from '../lib/clsx'
 
-function Dialog({ ...props }: DialogPrimitive.Root.Props) {
+import { Button } from './button'
+
+function Dialog({ ...props }: DialogPrimitive.Root.Props): React.ReactElement {
 	return <DialogPrimitive.Root data-slot='dialog' {...props} />
 }
 
-function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
+function DialogTrigger({
+	...props
+}: DialogPrimitive.Trigger.Props): React.ReactElement {
 	return <DialogPrimitive.Trigger data-slot='dialog-trigger' {...props} />
 }
 
-function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
+function DialogPortal({
+	...props
+}: DialogPrimitive.Portal.Props): React.ReactElement {
 	return <DialogPrimitive.Portal data-slot='dialog-portal' {...props} />
 }
 
-function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
+function DialogClose({
+	...props
+}: DialogPrimitive.Close.Props): React.ReactElement {
 	return <DialogPrimitive.Close data-slot='dialog-close' {...props} />
 }
 
 function DialogOverlay({
 	className,
 	...props
-}: DialogPrimitive.Backdrop.Props) {
+}: DialogPrimitive.Backdrop.Props): React.ReactElement {
 	return (
 		<DialogPrimitive.Backdrop
 			data-slot='dialog-overlay'
@@ -45,7 +53,7 @@ function DialogContent({
 	...props
 }: DialogPrimitive.Popup.Props & {
 	showCloseButton?: boolean
-}) {
+}): React.ReactElement {
 	return (
 		<DialogPortal>
 			<DialogOverlay />
@@ -78,7 +86,10 @@ function DialogContent({
 	)
 }
 
-function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
+function DialogHeader({
+	className,
+	...props
+}: React.ComponentProps<'div'>): React.ReactElement {
 	return (
 		<div
 			data-slot='dialog-header'
@@ -95,7 +106,7 @@ function DialogFooter({
 	...props
 }: React.ComponentProps<'div'> & {
 	showCloseButton?: boolean
-}) {
+}): React.ReactElement {
 	return (
 		<div
 			data-slot='dialog-footer'
@@ -115,7 +126,10 @@ function DialogFooter({
 	)
 }
 
-function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
+function DialogTitle({
+	className,
+	...props
+}: DialogPrimitive.Title.Props): React.ReactElement {
 	return (
 		<DialogPrimitive.Title
 			data-slot='dialog-title'
@@ -131,7 +145,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
 function DialogDescription({
 	className,
 	...props
-}: DialogPrimitive.Description.Props) {
+}: DialogPrimitive.Description.Props): React.ReactElement {
 	return (
 		<DialogPrimitive.Description
 			data-slot='dialog-description'

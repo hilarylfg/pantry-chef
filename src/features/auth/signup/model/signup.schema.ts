@@ -1,15 +1,11 @@
 import { z } from 'zod'
 
+import { emailField, nameField, passwordField } from '@/shared'
+
 export const SignupSchema = z.object({
-	name: z.string().min(1, {
-		message: 'Введите имя'
-	}),
-	email: z.string().email({
-		message: 'Некорректная почта'
-	}),
-	password: z.string().min(6, {
-		message: 'Пароль минимум 6 символов'
-	}),
+	name: nameField,
+	email: emailField,
+	password: passwordField,
 	acceptTerms: z.literal(true, {
 		errorMap: () => ({ message: 'Нужно принять условия' })
 	})

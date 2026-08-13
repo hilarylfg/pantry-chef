@@ -4,7 +4,7 @@ import { OTPInput, OTPInputContext } from 'input-otp'
 import { MinusIcon } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '@/shared'
+import { cn } from '../lib/clsx'
 
 function InputOTP({
 	className,
@@ -12,7 +12,7 @@ function InputOTP({
 	...props
 }: React.ComponentProps<typeof OTPInput> & {
 	containerClassName?: string
-}) {
+}): React.ReactElement {
 	return (
 		<OTPInput
 			data-slot='input-otp'
@@ -27,7 +27,10 @@ function InputOTP({
 	)
 }
 
-function InputOTPGroup({ className, ...props }: React.ComponentProps<'div'>) {
+function InputOTPGroup({
+	className,
+	...props
+}: React.ComponentProps<'div'>): React.ReactElement {
 	return (
 		<div
 			data-slot='input-otp-group'
@@ -46,7 +49,7 @@ function InputOTPSlot({
 	...props
 }: React.ComponentProps<'div'> & {
 	index: number
-}) {
+}): React.ReactElement {
 	const inputOTPContext = React.useContext(OTPInputContext)
 	const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
 
@@ -55,7 +58,7 @@ function InputOTPSlot({
 			data-slot='input-otp-slot'
 			data-active={isActive}
 			className={cn(
-				'relative rounded-md flex w-full h-17 items-center justify-center border border-foreground border-2 text-2xl bg-surface transition-all outline-none aria-invalid:border-destructive data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-3 data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20',
+				'relative rounded-md flex w-full h-[4.25rem] items-center justify-center border border-foreground border-2 text-2xl bg-surface transition-all outline-none aria-invalid:border-destructive data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-3 data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20',
 				className
 			)}
 			{...props}
@@ -70,7 +73,9 @@ function InputOTPSlot({
 	)
 }
 
-function InputOTPSeparator({ ...props }: React.ComponentProps<'div'>) {
+function InputOTPSeparator({
+	...props
+}: React.ComponentProps<'div'>): React.ReactElement {
 	return (
 		<div
 			data-slot='input-otp-separator'

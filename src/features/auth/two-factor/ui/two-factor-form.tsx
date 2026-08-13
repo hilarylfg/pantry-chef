@@ -1,27 +1,27 @@
 'use client'
 
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
-import { useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import {
-	useLoginMutation
+	type TwoFactorCredentials,
+	useLoginMutation,
+	useTwoFactorMutation
 } from '@/features/auth'
-import { useTwoFactorMutation } from '@/features/auth/two-factor/model/use-two-factor-mutation'
 import {
 	Field,
 	InputOTP,
 	InputOTPGroup,
-	InputOTPSlot
+	InputOTPSlot,
+	OTP_LENGTH
 } from '@/shared'
 
-export interface TwoFactorCredentials {
-	email: string
-	password: string
-}
-
-export function TwoFactorForm({ email, password }: TwoFactorCredentials) {
+export function TwoFactorForm({
+	email,
+	password
+}: TwoFactorCredentials): ReactElement {
 	const [code, setCode] = useState('')
-	const { verify, isLoadingVerify } = useTwoFactorMutation(email, password)
+	const { verify } = useTwoFactorMutation(email, password)
 	const { login } = useLoginMutation()
 
 	return (
@@ -31,19 +31,16 @@ export function TwoFactorForm({ email, password }: TwoFactorCredentials) {
 					className='w-full'
 					containerClassName='w-full'
 					id='digits-only'
-					maxLength={6}
+					maxLength={OTP_LENGTH}
 					value={code}
 					pattern={REGEXP_ONLY_DIGITS}
 					onComplete={() => verify(code)}
 					onChange={value => setCode(value)}
 				>
 					<InputOTPGroup>
-						<InputOTPSlot index={0} />
-						<InputOTPSlot index={1} />
-						<InputOTPSlot index={2} />
-						<InputOTPSlot index={3} />
-						<InputOTPSlot index={4} />
-						<InputOTPSlot index={5} />
+						{Array.from({ length: OTP_LENGTH }, (_, index) => (
+							<InputOTPSlot key={index} index={index} />
+						))}
 					</InputOTPGroup>
 				</InputOTP>
 			</Field>

@@ -1,10 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { userService } from '@/entities/user/api/user.service'
+import { type IUser, userService } from '@/entities/user'
 
-export function useProfileInfo() {
+const PROFILE_QUERY_KEY = ['profile']
+
+export function useProfileInfo(): {
+	user: IUser | undefined
+	isLoading: boolean
+} {
 	const { data: user, isLoading } = useQuery({
-		queryKey: ['profile'],
+		queryKey: PROFILE_QUERY_KEY,
 		queryFn: () => userService.findProfile()
 	})
 

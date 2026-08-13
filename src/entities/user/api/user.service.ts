@@ -1,13 +1,15 @@
 import { IUser, TypeSettingsSchema } from '@/entities/user'
 import { api } from '@/shared'
 
+const PROFILE_ENDPOINT: string = 'users/me'
+
 class UserService {
-	public async findProfile() {
-		return await api.get<IUser>('users/me')
+	public async findProfile(): Promise<IUser> {
+		return await api.get<IUser>(PROFILE_ENDPOINT)
 	}
 
-	public async updateProfile(body: TypeSettingsSchema) {
-		return await api.patch<IUser>('users/me', body)
+	public async updateProfile(body: TypeSettingsSchema): Promise<IUser> {
+		return await api.patch<IUser>(PROFILE_ENDPOINT, body)
 	}
 }
 

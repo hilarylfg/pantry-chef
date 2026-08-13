@@ -1,6 +1,8 @@
-import { toast } from '@/shared'
+import { toast } from '../ui/toast'
 
-export function toastMessageHandler(error: Error) {
+const SERVER_ERROR_TITLE: string = 'Ошибка со стороны сервера'
+
+export function toastMessageHandler(error: Error): void {
 	if (error.message) {
 		const errorMessage = error.message
 		const firstDotIndex = errorMessage.indexOf('.')
@@ -20,7 +22,7 @@ export function toastMessageHandler(error: Error) {
 	} else {
 		toast.add({
 			type: 'error',
-			title: 'Ошибка со стороны сервера'
+			title: SERVER_ERROR_TITLE
 		})
 	}
 }

@@ -1,8 +1,12 @@
 import { Loader2Icon } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from '@/shared'
+import { cn } from '../lib/clsx'
 
-function Spinner({ className, ...props }: React.ComponentProps<'svg'>) {
+function Spinner({
+	className,
+	...props
+}: React.ComponentProps<'svg'>): React.ReactElement {
 	return (
 		<Loader2Icon
 			data-slot='spinner'

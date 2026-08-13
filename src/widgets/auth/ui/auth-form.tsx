@@ -1,32 +1,38 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { type ReactElement, useCallback, useMemo, useState } from 'react'
 
-import { LoginForm, SignupForm, TwoFactorForm } from '@/features/auth'
+import {
+	type AuthFlowApi,
+	type AuthStep,
+	FlowContext,
+	LoginForm,
+	SignupForm,
+	type TwoFactorCredentials,
+	TwoFactorForm
+} from '@/features/auth'
 import { Tabs, TabsContent } from '@/shared'
-import { AuthFlowApi, AuthShell, AuthStep, FlowContext } from '@/widgets/auth'
+import { AuthShell } from '@/widgets/auth'
 
-export interface TwoFactorCredentials {
-	email: string
-	password: string
-}
-
-export function AuthForm() {
+export function AuthForm(): ReactElement {
 	const [mode, setMode] = useState<AuthStep>('login')
 	const [credentials, setCredentials] = useState<TwoFactorCredentials | null>(
 		null
 	)
 
-	const switchTo = useCallback((next: AuthStep) => setMode(next), [])
+	const switchTo = useCallback((next: AuthStep): void => setMode(next), [])
 
-	const requestTwoFactor = useCallback((email: string, password: string) => {
-		setCredentials({ email, password })
-		setMode('2fa')
-	}, [])
+	const requestTwoFactor = useCallback(
+		(email: string, password: string): void => {
+			setCredentials({ email, password })
+			setMode('2fa')
+		},
+		[]
+	)
 
 	const value = useMemo<AuthFlowApi>(
-		() => ({ mode, credentials, switchTo, requestTwoFactor }),
-		[mode, credentials, switchTo, requestTwoFactor]
+		() => ({ mode, switchTo, requestTwoFactor }),
+		[mode, switchTo, requestTwoFactor]
 	)
 
 	return (
@@ -42,8 +48,8 @@ export function AuthForm() {
 					<TabsContent value='2fa'>
 						{credentials && (
 							<TwoFactorForm
-								email={credentials?.email}
-								password={credentials?.password}
+								email={credentials.email}
+								password={credentials.password}
 							/>
 						)}
 					</TabsContent>
