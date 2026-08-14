@@ -28,8 +28,6 @@ function PushNotificationManager() {
 	)
 	const [message, setMessage] = useState('')
 
-	const { user, isLoading } = useProfileInfo()
-
 	useEffect(() => {
 		if ('serviceWorker' in navigator && 'PushManager' in window) {
 			setIsSupported(true)
@@ -78,24 +76,6 @@ function PushNotificationManager() {
 
 	return (
 		<div>
-			{user && (
-				<div className='flex gap-3 items-center mb-2'>
-					<Avatar className='size-11'>
-						<AvatarImage
-							src={user.picture}
-							alt={user.displayName}
-							className=''
-						/>
-						<AvatarFallback>CN</AvatarFallback>
-					</Avatar>
-					<div className='leading-0'>
-						<h2 className='text-lg font-medium'>
-							Привет, {user.displayName}
-						</h2>
-						<span className='text-xs'>Что приготовим сегодня?</span>
-					</div>
-				</div>
-			)}
 			<h3>Push Notifications</h3>
 			{subscription ? (
 				<>
@@ -160,10 +140,30 @@ function InstallPrompt() {
 }
 
 export default function Page() {
+    const { user } = useProfileInfo()
+
 	return (
 		<div className='flex min-h-svh p-6'>
 			<div className='flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose'>
-				<PushNotificationManager />
+    			{user && (
+    				<div className='flex gap-3 items-center mb-2'>
+    					<Avatar className='size-11'>
+    						<AvatarImage
+    							src={user.picture}
+    							alt={user.displayName}
+    							className=''
+    						/>
+    						<AvatarFallback>CN</AvatarFallback>
+    					</Avatar>
+    					<div className='leading-0'>
+    						<h2 className='text-lg font-medium'>
+    							Привет, {user.displayName}
+    						</h2>
+    						<span className='text-xs'>Что приготовим сегодня?</span>
+    					</div>
+    				</div>
+    			)}
+                <PushNotificationManager />
 				<InstallPrompt />
 			</div>
 		</div>

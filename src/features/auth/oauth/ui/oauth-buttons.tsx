@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { type ReactElement } from 'react'
-import { FaApple, FaGoogle, FaYandex } from 'react-icons/fa'
+import { FaGithub, FaGoogle, FaYandex } from 'react-icons/fa'
 
 import { type OAuthProvider, useOauthMutation } from '@/features/auth'
 import { Button } from '@/shared'
@@ -12,13 +12,13 @@ const OAUTH_PROVIDERS: ReadonlyArray<{
 	icon: ReactElement
 }> = [
 	{ provider: 'google', icon: <FaGoogle className='size-5' /> },
-	{ provider: 'apple', icon: <FaApple className='size-5' /> },
+	{ provider: 'github', icon: <FaGithub className='size-5' /> },
 	{ provider: 'yandex', icon: <FaYandex className='size-5' /> }
 ]
 
 const PROVIDER_BUTTON_LABELS: Readonly<Record<OAuthProvider, string>> = {
 	google: 'Register with Google',
-	apple: 'Register with Apple',
+	github: 'Register with Github',
 	yandex: 'Register with Yandex'
 }
 

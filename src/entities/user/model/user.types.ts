@@ -7,7 +7,7 @@ export enum AuthMethod {
 	Credentials = 'CREDENTIALS',
 	Google = 'GOOGLE',
 	Yandex = 'YANDEX',
-	Apple = 'APPLE'
+	Github = 'GITHUB'
 }
 
 export interface IAccount {
