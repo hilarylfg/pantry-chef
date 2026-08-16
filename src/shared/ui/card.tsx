@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { cn } from '../lib/clsx'
+import { cn } from '@/shared'
 
 function Card({
 	className,

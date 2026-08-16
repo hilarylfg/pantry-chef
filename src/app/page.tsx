@@ -1,10 +1,27 @@
 'use client'
 
+import {
+	CookingPot,
+	House,
+	Refrigerator,
+	Scan,
+	ScanBarcode,
+	ShoppingCart,
+	User
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { sendNotification, subscribeUser, unsubscribeUser } from '@/app/actions'
 import { useProfileInfo } from '@/entities/user'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared'
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger
+} from '@/shared'
 
 function urlBase64ToUint8Array(base64String: string) {
 	const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
@@ -143,8 +160,11 @@ export default function Page() {
 	const { user } = useProfileInfo()
 
 	return (
-		<div className='flex min-h-svh p-6'>
-			<div className='flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose'>
+		<Tabs className='flex min-h-svh'>
+			<TabsContent
+				value='home'
+				className='flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose p-6'
+			>
 				{user && (
 					<div className='flex gap-3 items-center mb-2'>
 						<Avatar className='size-11'>
@@ -167,7 +187,55 @@ export default function Page() {
 				)}
 				<PushNotificationManager />
 				<InstallPrompt />
-			</div>
-		</div>
+			</TabsContent>
+			<TabsContent value='products'>52</TabsContent>
+			<TabsContent value='scan'>52</TabsContent>
+			<TabsContent value='list'>52</TabsContent>
+			<TabsContent value='profile'>52</TabsContent>
+			<TabsList className='!h-auto m-0 w-full pt-3 px-3 pb-5 rounded-none'>
+				<TabsTrigger
+					value='home'
+					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
+				>
+					<div className='px-3 py-1.5 rounded-sm'>
+						<House />
+					</div>
+					<span>Главная</span>
+				</TabsTrigger>
+				<TabsTrigger
+					value='products'
+					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
+				>
+					<div className='px-3 py-1.5 rounded-sm'>
+						<CookingPot />
+					</div>
+					<span>Продукты</span>
+				</TabsTrigger>
+				<TabsTrigger
+					value='scan'
+					className='flex-[0_0_auto] size-15 rounded-full flex-col -mt-12 bg-[linear-gradient(148deg,color-mix(in_oklab,var(--primary),var(--cream)_16%),var(--primary)_52%,color-mix(in_oklab,var(--primary),var(--coal)_22%))] data-active:[&_svg]:text-foreground'
+				>
+					<Scan className='size-6 text-background' />
+				</TabsTrigger>
+				<TabsTrigger
+					value='list'
+					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
+				>
+					<div className='px-3 py-1.5 rounded-sm'>
+						<ShoppingCart />
+					</div>
+					<span>Список</span>
+				</TabsTrigger>
+				<TabsTrigger
+					value='profile'
+					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
+				>
+					<div className='px-3 py-1.5 rounded-sm'>
+						<User />
+					</div>
+					<span>Профиль</span>
+				</TabsTrigger>
+			</TabsList>
+		</Tabs>
 	)
 }

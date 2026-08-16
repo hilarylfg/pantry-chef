@@ -3,10 +3,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
-import { cn } from '../lib/clsx'
-
-import { Label } from './label'
-import { Separator } from './separator'
+import { cn, Label, Separator } from '@/shared'
 
 function FieldSet({
 	className,

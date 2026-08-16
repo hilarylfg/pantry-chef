@@ -11,9 +11,7 @@ import {
 } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '../lib/clsx'
-
-import { Button } from './button'
+import { Button, cn } from '@/shared'
 
 const toast = ToastPrimitive.createToastManager()
 

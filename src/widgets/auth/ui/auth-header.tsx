@@ -1,7 +1,7 @@
 import { ArrowLeftIcon } from 'lucide-react'
 import { type ReactElement } from 'react'
 
-import { Button } from '@/shared'
+import { Button, LogoMono } from '@/shared'
 
 export function AuthHeader(): ReactElement {
 	return (
@@ -10,7 +10,7 @@ export function AuthHeader(): ReactElement {
 				<ArrowLeftIcon />
 			</Button>
 			<div className='flex items-center gap-2'>
-				<img src='/logo/logo.svg' alt='Logo' />
+				<LogoMono className='w-8' />
 				<span className='font-extrabold'>PantryChef</span>
 			</div>
 		</div>

@@ -74,6 +74,14 @@ export {
 } from './ui/input-otp'
 export { Spinner } from './ui/spinner'
 export { TextField } from './ui/text-field'
+export {
+	Logo,
+	LogoText,
+	LogoTextOnly,
+	LogoMono,
+	LogoTextMono,
+	LogoTextOnlyMono
+} from './ui/logo'
 
 export { FetchClient } from './lib/fetch/fetch-client'
 export { FetchError } from './lib/fetch/fetch-error'
