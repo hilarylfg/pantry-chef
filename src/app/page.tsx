@@ -22,6 +22,7 @@ import {
 	TabsList,
 	TabsTrigger
 } from '@/shared'
+import { Profile } from '@/widgets/profile'
 
 function urlBase64ToUint8Array(base64String: string) {
 	const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
@@ -163,10 +164,10 @@ export default function Page() {
 		<Tabs className='flex min-h-svh'>
 			<TabsContent
 				value='home'
-				className='flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose p-6'
+				className='flex max-w-md min-w-0 flex-col gap-4 p-6 text-sm leading-loose'
 			>
 				{user && (
-					<div className='flex gap-3 items-center mb-2'>
+					<div className='mb-2 flex items-center gap-3'>
 						<Avatar className='size-11'>
 							<AvatarImage
 								src={user.picture}
@@ -191,13 +192,18 @@ export default function Page() {
 			<TabsContent value='products'>52</TabsContent>
 			<TabsContent value='scan'>52</TabsContent>
 			<TabsContent value='list'>52</TabsContent>
-			<TabsContent value='profile'>52</TabsContent>
-			<TabsList className='!h-auto m-0 w-full pt-3 px-3 pb-5 rounded-none'>
+			<TabsContent
+				value='profile'
+				className='flex max-w-md min-w-0 flex-col gap-4 p-6 text-sm leading-loose'
+			>
+				<Profile />
+			</TabsContent>
+			<TabsList className='m-0 !h-auto w-full rounded-none px-3 pt-3 pb-5'>
 				<TabsTrigger
 					value='home'
 					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
 				>
-					<div className='px-3 py-1.5 rounded-sm'>
+					<div className='rounded-sm px-3 py-1.5'>
 						<House />
 					</div>
 					<span>Главная</span>
@@ -206,14 +212,14 @@ export default function Page() {
 					value='products'
 					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
 				>
-					<div className='px-3 py-1.5 rounded-sm'>
+					<div className='rounded-sm px-3 py-1.5'>
 						<CookingPot />
 					</div>
 					<span>Продукты</span>
 				</TabsTrigger>
 				<TabsTrigger
 					value='scan'
-					className='flex-[0_0_auto] size-15 rounded-full flex-col -mt-12 bg-[linear-gradient(148deg,color-mix(in_oklab,var(--primary),var(--cream)_16%),var(--primary)_52%,color-mix(in_oklab,var(--primary),var(--coal)_22%))] data-active:[&_svg]:text-foreground'
+					className='-mt-12 size-15 flex-[0_0_auto] flex-col rounded-full bg-[linear-gradient(148deg,color-mix(in_oklab,var(--primary),var(--cream)_16%),var(--primary)_52%,color-mix(in_oklab,var(--primary),var(--coal)_22%))] data-active:[&_svg]:text-foreground'
 				>
 					<Scan className='size-6 text-background' />
 				</TabsTrigger>
@@ -221,7 +227,7 @@ export default function Page() {
 					value='list'
 					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
 				>
-					<div className='px-3 py-1.5 rounded-sm'>
+					<div className='rounded-sm px-3 py-1.5'>
 						<ShoppingCart />
 					</div>
 					<span>Список</span>
@@ -230,7 +236,7 @@ export default function Page() {
 					value='profile'
 					className='flex-col gap-1 data-active:[&_div]:bg-[color-mix(in_oklab,var(--primary),var(--surface)_84%)] data-active:[&_div_svg]:text-primary'
 				>
-					<div className='px-3 py-1.5 rounded-sm'>
+					<div className='rounded-sm px-3 py-1.5'>
 						<User />
 					</div>
 					<span>Профиль</span>

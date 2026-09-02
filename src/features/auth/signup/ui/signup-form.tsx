@@ -77,7 +77,7 @@ export function SignupForm(): ReactElement {
 							aria-invalid={fieldState.invalid}
 						/>
 						<FieldLabel
-							className='text-[13px] gap-1'
+							className='gap-1 text-[13px]'
 							htmlFor='signup-terms'
 						>
 							Я принимаю

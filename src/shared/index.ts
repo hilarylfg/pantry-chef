@@ -82,6 +82,7 @@ export {
 	LogoTextMono,
 	LogoTextOnlyMono
 } from './ui/logo'
+export { Switch } from './ui/switch'
 
 export { FetchClient } from './lib/fetch/fetch-client'
 export { FetchError } from './lib/fetch/fetch-error'

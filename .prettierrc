@@ -10,8 +10,8 @@
   "importOrderSortSpecifiers": true,
   "importOrderCaseInsensitive": true,
   "printWidth": 80,
-  "plugins": ["prettier-plugin-tailwindcss", "@trivago/prettier-plugin-sort-imports"],
-  "tailwindStylesheet": "app/globals.css",
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  "tailwindStylesheet": "src/app/globals.css",
   "tailwindFunctions": ["cn", "cva"],
   "importOrder": ["<THIRD_PARTY_MODULES>", "^@/(.*)$", "^../(.*)", "^./(.*)"]
 }
