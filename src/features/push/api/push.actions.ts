@@ -2,6 +2,8 @@
 
 import webpush from 'web-push'
 
+import { toast } from '@/shared'
+
 type WebPushSubscription = {
 	endpoint: string
 	keys: {
@@ -37,7 +39,7 @@ export async function sendNotification(message: string) {
 
 	try {
 		await webpush.sendNotification(
-			subscription, // Now matches the expected type
+			subscription,
 			JSON.stringify({
 				title: 'Test Notification',
 				body: message,
@@ -47,6 +49,10 @@ export async function sendNotification(message: string) {
 		return { success: true }
 	} catch (error) {
 		console.error('Error sending push notification:', error)
+		toast.add({
+			title: 'Error',
+			description: 'Failed to send notification'
+		})
 		return { success: false, error: 'Failed to send notification' }
 	}
 }

@@ -1,0 +1,1776 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PantryChef · «Тёплая кухня» — прототип v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   PantryChef v3 — «Тёплая кухня», улучшенная.
+   Возврат к тёплой идентичности: мандарин на креме, дружелюбная Nunito.
+   Дисциплина: единая 8pt-сетка (4·8·12·16·24·32), боковой отступ экрана 16,
+   одна шкала радиусов (8/12/16/20), OKLch-токены, цифры — моноширинные.
+   Фирменный логотип — public/logo/logo.svg (тёмно-зелёный + золото).
+   ========================================================================= */
+:root{
+  --bg:        oklch(0.968 0.014 86);   /* крем */
+  --surface:   oklch(0.988 0.007 90);   /* карточки */
+  --surface-2: oklch(0.945 0.018 80);   /* поля, чипы */
+  --fg:        oklch(0.30 0.02 50);     /* тёплый эспрессо */
+  --muted:     oklch(0.555 0.02 62);
+  --border:    oklch(0.905 0.018 82);
+  --accent:    oklch(0.645 0.135 47);   /* мандарин */
+  --accent-on: oklch(0.985 0.008 90);
+  --accent-soft: oklch(0.938 0.045 62); /* мягкая мандариновая подложка */
+  --fresh:     oklch(0.60 0.12 148);    /* свежо */
+  --soon:      oklch(0.73 0.13 74);     /* скоро */
+  --late:      oklch(0.585 0.15 30);    /* спасаем */
+  --deep:      oklch(0.22 0.025 55);    /* тёплый уголь: камера, мокап */
+
+  --font-ui:'Nunito','Hanken Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-pill:999px;
+  --ring:0 0 0 2px var(--bg),0 0 0 4px var(--accent);
+  --ease:cubic-bezier(.2,0,0,1);
+  --maxw:1340px;
+}
+[data-theme="dark"]{
+  --bg:        oklch(0.25 0.014 55);
+  --surface:   oklch(0.30 0.016 58);
+  --surface-2: oklch(0.345 0.018 56);
+  --fg:        oklch(0.945 0.014 84);
+  --muted:     oklch(0.72 0.018 74);
+  --border:    oklch(0.37 0.016 58);
+  --accent:    oklch(0.745 0.14 52);
+  --accent-on: oklch(0.23 0.03 52);
+  --accent-soft: oklch(0.345 0.05 52);
+  --fresh:     oklch(0.71 0.13 148);
+  --soon:      oklch(0.81 0.13 76);
+  --late:      oklch(0.70 0.15 30);
+  --deep:      oklch(0.165 0.018 52);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:var(--font-ui);font-size:16px;line-height:1.5;
+  text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
+  transition:background .3s var(--ease),color .3s var(--ease);
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+p{margin:0}
+h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:800}
+::selection{background:color-mix(in oklab,var(--accent),transparent 72%)}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:28px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+/* ── верхняя панель ──────────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:40;background:color-mix(in oklab,var(--bg),transparent 12%);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-in{display:flex;align-items:center;justify-content:space-between;padding-block:16px;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-chip{width:40px;height:40px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 94%)}
+.logo-chip img{width:22px}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1}
+.brand-name b{color:var(--accent);font-weight:800}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.theme-toggle{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-pill);padding:4px}
+[data-theme-btn]{display:inline-flex;align-items:center;padding:8px 16px;border-radius:var(--r-pill);font-size:13px;font-weight:700;color:var(--muted);transition:color .2s var(--ease),background .2s var(--ease)}
+[data-theme-btn].is-on{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 92%)}
+
+/* ── интро ───────────────────────────────────────────────────────────── */
+.intro{padding-block:clamp(48px,7vw,80px) clamp(28px,4vw,44px)}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:inline-flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:24px;height:1px;background:var(--accent)}
+.intro h1{font-size:clamp(38px,5.2vw,62px);line-height:1.04;letter-spacing:-.02em;max-width:17ch}
+.intro h1 em{font-style:normal;color:var(--accent)}
+.intro .lead{margin-top:20px;font-size:clamp(16px,1.5vw,19px);line-height:1.55;color:var(--muted);max-width:58ch}
+.principles{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.principle{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);font-size:13.5px;font-weight:700}
+.principle svg{width:15px;height:15px;color:var(--accent)}
+.pals{display:flex;flex-wrap:wrap;gap:32px;margin-top:32px}
+.pal .pal-t{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.pal .pal-row{display:flex;gap:8px;align-items:center}
+.pal .dot{width:24px;height:24px;border-radius:8px;border:1px solid var(--border)}
+.pal .pal-n{font-size:12.5px;color:var(--muted);margin-top:8px;max-width:36ch;line-height:1.45}
+
+/* ── секции галереи ──────────────────────────────────────────────────── */
+.gallery{padding-block:clamp(24px,3.5vw,44px);border-top:1px solid var(--border)}
+.flow-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:24px 0 24px}
+.flow-head h2{font-size:clamp(21px,2.4vw,28px);letter-spacing:-.015em}
+.flow-head p{color:var(--muted);font-size:14px;max-width:52ch}
+.flow-tag{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.phones{display:flex;flex-wrap:wrap;gap:32px;justify-content:center}
+.phone{display:flex;flex-direction:column;align-items:center;scroll-margin-top:88px}
+.phone-caption{margin-top:16px;text-align:center}
+.phone-caption .pc-n{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;color:var(--accent);text-transform:uppercase}
+.phone-caption .pc-t{font-size:16px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
+.phone-caption .pc-d{font-size:12.5px;color:var(--muted);margin-top:4px;max-width:34ch}
+
+/* ── мокап устройства ────────────────────────────────────────────────── */
+.phone-frame{
+  position:relative;width:404px;border-radius:56px;padding:10px;
+  background:linear-gradient(165deg,oklch(0.31 0.012 60),oklch(0.21 0.012 55));
+  box-shadow:0 28px 56px -24px color-mix(in oklab,var(--deep),transparent 55%),0 0 0 1px color-mix(in oklab,var(--deep),transparent 35%);
+}
+.phone-frame::before{content:"";position:absolute;left:-2px;top:116px;width:3px;height:84px;border-radius:2px 0 0 2px;background:oklch(0.235 0.012 55)}
+.phone-frame::after{content:"";position:absolute;right:-2px;top:148px;width:3px;height:60px;border-radius:0 2px 2px 0;background:oklch(0.235 0.012 55)}
+.phone-screen{position:relative;width:380px;height:812px;border-radius:46px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:112px;height:30px;background:oklch(0.16 0.012 55);border-radius:var(--r-pill);z-index:40}
+.stbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 8px;font-size:13px;font-weight:800;flex:0 0 auto}
+.stbar .sb-i{display:flex;align-items:center;gap:6px}
+.stbar svg{width:15px;height:15px}
+.stwrap{position:sticky;top:0;z-index:30;background:color-mix(in oklab,var(--bg),transparent 8%);backdrop-filter:blur(12px)}
+.screen-body{flex:1;overflow:hidden;position:relative}
+.screen-scroll{height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen-scroll::-webkit-scrollbar{display:none}
+.home-ind{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:4px;border-radius:99px;background:color-mix(in oklab,var(--fg),transparent 55%);z-index:20}
+
+/* ── базовые элементы: всё на сетке 16px ─────────────────────────────── */
+.app-head{padding:8px 16px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.app-head .t{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.app-head .s{font-size:12.5px;color:var(--muted);margin-top:4px}
+.head-actions{display:flex;gap:8px}
+.icon-btn{flex:0 0 auto;width:40px;height:40px;border-radius:var(--r-md);display:grid;place-items:center;background:var(--surface);color:var(--fg);border:1px solid var(--border);transition:background .2s var(--ease);position:relative}
+.icon-btn:hover{background:var(--surface-2)}
+.icon-btn.accent{background:var(--accent);color:var(--accent-on);border-color:var(--accent)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn .idot{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.avatar-s{width:40px;height:40px;border-radius:50%;background:linear-gradient(150deg,color-mix(in oklab,var(--accent),var(--cream,#fff) 12%),color-mix(in oklab,var(--late),var(--deep) 18%));display:grid;place-items:center;color:var(--accent-on);font-size:15px;font-weight:800}
+.section-label{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin:24px 16px 8px;display:flex;justify-content:space-between;align-items:baseline}
+.section-label .sl-n{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0}
+.stack{display:flex;flex-direction:column;gap:12px;padding:0 16px}
+
+/* чипы */
+.chip-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 16px 8px}
+.chip-row::-webkit-scrollbar{display:none}
+[data-chip]{flex:0 0 auto;padding:8px 16px;border-radius:var(--r-pill);background:var(--surface-2);border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:700;white-space:nowrap;transition:all .2s var(--ease)}
+[data-chip]:hover{color:var(--fg)}
+[data-chip].is-active{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* карточка «Спасаем» */
+.rescue{margin:0 16px;display:flex;align-items:center;gap:12px;padding:16px;border-radius:var(--r-lg);background:color-mix(in oklab,var(--late),var(--surface) 88%);border:1px solid color-mix(in oklab,var(--late),var(--surface) 60%)}
+.rescue .ri{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:grid;place-items:center;background:color-mix(in oklab,var(--late),var(--surface) 76%);color:color-mix(in oklab,var(--late),var(--fg) 20%)}
+.rescue .ri svg{width:20px;height:20px}
+.rescue .rt{font-size:14px;font-weight:800;line-height:1.25}
+.rescue .r-go{margin-left:auto;flex:0 0 auto;font-size:12.5px;font-weight:800;color:color-mix(in oklab,var(--late),var(--fg) 20%);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.rescue .r-go svg{width:14px;height:14px}
+.mini-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.mini-chip{padding:4px 12px;border-radius:var(--r-pill);background:var(--surface);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted)}
+
+/* идеи */
+.idea{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);transition:border-color .2s var(--ease)}
+.idea:hover{border-color:color-mix(in oklab,var(--fg),transparent 76%)}
+.idea .if{width:56px;height:56px;flex:0 0 auto;border-radius:12px}
+.idea .ib{flex:1;min-width:0}
+.idea .it{font-size:14.5px;font-weight:800;line-height:1.25}
+.idea .im{font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.idea .ia{flex:0 0 auto;width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--muted)}
+.idea .ia svg{width:16px;height:16px}
+.idea .ia:hover{color:var(--fg);background:var(--surface-2)}
+.badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--r-pill);font-size:11px;font-weight:800;white-space:nowrap}
+.badge-fresh{background:color-mix(in oklab,var(--fresh),var(--surface) 86%);color:color-mix(in oklab,var(--fresh),var(--fg) 30%)}
+.badge-soon {background:color-mix(in oklab,var(--soon), var(--surface) 80%);color:color-mix(in oklab,var(--soon), var(--fg) 30%)}
+.badge-late {background:color-mix(in oklab,var(--late), var(--surface) 84%);color:color-mix(in oklab,var(--late), var(--fg) 24%)}
+
+/* строки продуктов «как чек» */
+.pgroup{margin:0 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.prow{display:flex;align-items:center;gap:12px;padding:12px 16px;transition:background .15s var(--ease)}
+.prow + .prow{border-top:1px solid var(--border)}
+.prow:hover{background:color-mix(in oklab,var(--surface-2),transparent 55%)}
+.ptile{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:grid;place-items:center}
+.ptile svg{width:20px;height:20px;color:color-mix(in oklab,var(--fg),transparent 30%)}
+.t-dairy{background:color-mix(in oklab,oklch(0.87 0.05 92),var(--surface) 40%)}
+.t-greens{background:color-mix(in oklab,oklch(0.84 0.07 145),var(--surface) 44%)}
+.t-meat{background:color-mix(in oklab,oklch(0.81 0.06 42),var(--surface) 46%)}
+.t-fruit{background:color-mix(in oklab,oklch(0.85 0.08 68),var(--surface) 44%)}
+.t-pantry{background:color-mix(in oklab,oklch(0.88 0.025 84),var(--surface) 40%)}
+.pname{font-size:14px;font-weight:700;white-space:nowrap}
+.leader{flex:1;min-width:16px;border-bottom:2px dotted color-mix(in oklab,var(--fg),transparent 70%);transform:translateY(3px)}
+.pqty{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);white-space:nowrap}
+.search-bar{display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;color:var(--muted);font-size:14px;margin:0 16px}
+.search-bar svg{width:20px;height:20px;flex:0 0 auto}
+
+/* быстрые действия */
+.qactions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px}
+.qaction{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);transition:border-color .2s var(--ease),transform .1s var(--ease)}
+.qaction:hover{border-color:color-mix(in oklab,var(--fg),transparent 76%)}
+.qaction:active{transform:translateY(1px)}
+.qa-ic{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:color-mix(in oklab,var(--accent),var(--fg) 15%);display:grid;place-items:center}
+.qa-ic svg{width:20px;height:20px}
+.qaction span:last-child{font-size:11px;font-weight:800;color:var(--fg)}
+
+/* сводка холодильника на главной */
+.sum-card{margin:0 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
+.sum-top{display:flex;justify-content:space-between;align-items:center}
+.sum-top .st{font-size:15px;font-weight:800}
+.sum-top .sa{font-size:12.5px;font-weight:800;color:var(--accent);display:inline-flex;align-items:center;gap:4px}
+.sum-top .sa svg{width:14px;height:14px}
+.sum-nums{display:flex;gap:8px;margin-top:12px}
+.snum{flex:1;border-radius:var(--r-md);padding:8px;text-align:center;background:var(--surface-2)}
+.snum .n{font-family:var(--font-mono);font-size:16px;font-weight:600}
+.snum .l{font-size:10.5px;color:var(--muted);margin-top:2px}
+.snum.warn{background:color-mix(in oklab,var(--late),var(--surface) 86%)}
+.snum.warn .n{color:color-mix(in oklab,var(--late),var(--fg) 15%)}
+.snum.mid{background:color-mix(in oklab,var(--soon),var(--surface) 84%)}
+.snum.mid .n{color:color-mix(in oklab,var(--soon),var(--fg) 25%)}
+.snum.ok .n{color:color-mix(in oklab,var(--fresh),var(--fg) 25%)}
+
+/* строка-ссылка */
+.link-row{margin:0 16px;display:flex;align-items:center;gap:12px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);font-size:14px;font-weight:800}
+.link-row svg:first-child{width:20px;height:20px;color:var(--accent)}
+.link-row .n{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.link-row .n svg{width:16px;height:16px}
+
+/* нижняя навигация — 5 вкладок */
+.tab-bar{flex:0 0 auto;display:flex;align-items:flex-end;padding:8px 8px 24px;background:color-mix(in oklab,var(--bg),transparent 4%);border-top:1px solid var(--border);position:relative}
+.tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);transition:color .2s var(--ease);position:relative}
+.tab .ti{display:grid;place-items:center;width:40px;height:28px;border-radius:var(--r-sm);transition:background .25s var(--ease)}
+.tab svg{width:20px;height:20px}
+.tab .tl{font-size:10px;font-weight:800;letter-spacing:.01em;white-space:nowrap}
+.tab:hover{color:var(--fg)}
+.tab.active{color:var(--accent)}
+.tab.active .ti{background:var(--accent-soft)}
+.tab.active .tl{color:var(--fg)}
+.tab .tb{position:absolute;top:-4px;right:calc(50% - 20px);min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-pill);background:var(--accent);color:var(--accent-on);font-family:var(--font-mono);font-size:9.5px;font-weight:600;display:grid;place-items:center}
+
+/* шиты */
+.sheet-dim{position:absolute;inset:0;background:color-mix(in oklab,var(--deep),transparent 42%);z-index:10}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:12;background:var(--surface);border-radius:24px 24px 0 0;padding:12px 16px 32px;box-shadow:0 -16px 40px -16px color-mix(in oklab,var(--deep),transparent 55%)}
+.grabber{width:40px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 16px}
+.sheet h3{font-size:20px;font-weight:800;letter-spacing:-.015em}
+.sheet .sh-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.field{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.field label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.input{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--fg);font:inherit;font-size:15px}
+.input svg{width:20px;height:20px;color:var(--muted);flex:0 0 auto}
+.input .ph{color:var(--muted)}
+.caret{display:inline-block;width:2px;height:20px;background:var(--accent);border-radius:2px;margin-left:2px;animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.row-line{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px}
+.row-line:last-of-type{border-bottom:0}
+.row-line .rl-k{color:var(--muted);font-size:12.5px;flex:0 0 84px;font-weight:700}
+.row-line .rl-v{font-weight:700}
+.row-line .rl-a{margin-left:auto;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;font-weight:700}
+.row-line .rl-a svg{width:16px;height:16px}
+.stepper{display:inline-flex;align-items:center;gap:12px;padding:4px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg)}
+.stepper button{width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--surface-2);color:var(--fg)}
+.stepper button svg{width:16px;height:16px}
+.stepper .stv{font-family:var(--font-mono);font-size:14px;font-weight:600;min-width:56px;text-align:center}
+.hint{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:12px 16px;background:var(--accent-soft);border-radius:var(--r-md);font-size:12.5px;color:color-mix(in oklab,var(--accent),var(--fg) 20%);line-height:1.4}
+.hint svg{width:16px;height:16px;flex:0 0 auto;margin-top:1px}
+.seg3{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:4px;margin-top:8px}
+.seg3 button{flex:1;padding:8px;border-radius:var(--r-sm);font-size:12.5px;font-weight:700;color:var(--muted);transition:all .2s var(--ease)}
+.seg3 button.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 90%)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;padding:0 16px;border-radius:var(--r-md);font-size:15px;font-weight:800;transition:filter .2s var(--ease),background .2s var(--ease)}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:var(--accent);color:var(--accent-on)}
+.btn-primary:hover{background:color-mix(in oklab,var(--accent),var(--deep) 8%)}
+.btn-secondary{background:var(--surface-2);color:var(--fg);border:1px solid var(--border)}
+.btn-ghost{color:var(--muted)}
+.btn-ghost:hover{color:var(--fg)}
+.btn-row{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.action-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.atile{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg);font-size:11.5px;font-weight:800;color:var(--fg)}
+.atile svg{width:20px;height:20px;color:var(--muted)}
+.atile.warm{background:color-mix(in oklab,var(--late),var(--surface) 88%);border-color:color-mix(in oklab,var(--late),var(--surface) 58%)}
+.atile.warm svg{color:color-mix(in oklab,var(--late),var(--fg) 20%)}
+
+/* пустое состояние */
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 32px}
+.empty .e-ic{width:112px;height:112px;border-radius:32px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:24px}
+.empty .e-ic img{width:52px}
+.empty .e-ic svg{width:48px;height:48px;color:color-mix(in oklab,var(--accent),var(--fg) 15%)}
+.empty h2{font-size:20px;letter-spacing:-.01em}
+.empty p{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.5;max-width:26ch}
+.empty .e-actions{margin-top:24px;display:flex;flex-direction:column;gap:12px;width:100%}
+
+/* сканер */
+.scan{height:100%;display:flex;flex-direction:column;color:oklch(0.965 0.012 86);position:relative;background:oklch(0.20 0.022 55)}
+.scan-feed{position:absolute;inset:0;z-index:0;background:radial-gradient(90% 60% at 50% 38%,color-mix(in oklab,var(--fg),transparent 88%),transparent 70%),linear-gradient(160deg,color-mix(in oklab,oklch(0.45 0.05 50),transparent 88%),transparent 40%)}
+.scan-vig{position:absolute;inset:0;z-index:1;background:radial-gradient(130% 85% at 50% 42%,transparent 42%,color-mix(in oklab,oklch(0.16 0.02 55),transparent 30%))}
+.scan-top{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:56px 16px 0}
+.scan-x{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in oklab,oklch(0.965 0.012 86),transparent 86%);backdrop-filter:blur(8px);color:oklch(0.965 0.012 86)}
+.scan-seg{display:flex;background:color-mix(in oklab,oklch(0.16 0.02 55),transparent 50%);backdrop-filter:blur(8px);border-radius:var(--r-pill);padding:4px}
+.scan-seg button{padding:8px 16px;border-radius:var(--r-pill);font-size:12.5px;font-weight:800;color:color-mix(in oklab,oklch(0.965 0.012 86),transparent 35%)}
+.scan-seg button.on{background:oklch(0.965 0.012 86);color:oklch(0.25 0.02 55)}
+.scan-frame{position:relative;z-index:3;flex:1;margin:32px 40px;display:grid;place-items:center}
+.scan-frame .box{width:100%;aspect-ratio:4/3;position:relative}
+.scan-frame .crn{position:absolute;width:28px;height:28px;border:3px solid var(--accent);border-radius:4px}
+.scan-frame .crn.tl{top:0;left:0;border-right:0;border-bottom:0;border-top-left-radius:12px}
+.scan-frame .crn.tr{top:0;right:0;border-left:0;border-bottom:0;border-top-right-radius:12px}
+.scan-frame .crn.bl{bottom:0;left:0;border-right:0;border-top:0;border-bottom-left-radius:12px}
+.scan-frame .crn.br{bottom:0;right:0;border-left:0;border-top:0;border-bottom-right-radius:12px}
+.scan-hint{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);white-space:nowrap;background:color-mix(in oklab,oklch(0.16 0.02 55),transparent 50%);backdrop-filter:blur(8px);padding:8px 16px;border-radius:var(--r-pill);font-size:12.5px;font-weight:700}
+.scan-bottom{position:relative;z-index:3;padding:8px 0 40px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.capture{width:64px;height:64px;border-radius:50%;background:oklch(0.965 0.012 86);border:4px solid color-mix(in oklab,oklch(0.965 0.012 86),transparent 55%);display:grid;place-items:center;transition:transform .1s var(--ease)}
+.capture:active{transform:scale(.94)}
+.capture .inner{width:48px;height:48px;border-radius:50%;background:var(--accent)}
+.scan-mode{font-size:12px;color:color-mix(in oklab,oklch(0.965 0.012 86),transparent 25%)}
+
+/* результаты скана */
+.rs-head{display:flex;align-items:center;gap:12px;padding:8px 16px}
+.rs-head .t{font-size:20px;font-weight:800;flex:1}
+.rs-link{font-size:12.5px;font-weight:800;color:var(--accent)}
+.rs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 16px}
+.rs-card{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;cursor:pointer}
+.rs-card .rt-t{width:36px;height:36px;flex:0 0 auto;border-radius:10px;display:grid;place-items:center}
+.rs-card .rt-t svg{width:18px;height:18px;color:color-mix(in oklab,var(--fg),transparent 35%)}
+.rs-card .rn{flex:1;min-width:0}
+.rs-card .rn .nm{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-card .rn .cf{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);margin-top:2px}
+.rs-card .tick{width:24px;height:24px;border-radius:var(--r-sm);border:1.5px solid var(--border);display:grid;place-items:center;color:transparent;flex:0 0 auto}
+.rs-card .tick svg{width:16px;height:16px}
+.rs-card.is-checked .tick{background:var(--fresh);border-color:var(--fresh);color:oklch(0.985 0.008 90)}
+.rs-card.is-dim{opacity:.55}
+.rs-foot{padding:8px 16px 32px;display:flex;flex-direction:column;gap:12px}
+
+/* рецепты */
+.segbar{display:flex;gap:4px;margin:0 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:4px}
+.segbar button{flex:1;padding:8px;border-radius:var(--r-sm);font-size:12.5px;font-weight:800;color:var(--muted);transition:all .2s var(--ease)}
+.segbar button.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 90%)}
+.rrow{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
+.rrow .rf{width:52px;height:52px;flex:0 0 auto;border-radius:12px}
+.rrow .rb{flex:1;min-width:0}
+.rrow .rt{font-size:14px;font-weight:800;line-height:1.25}
+.rrow .rm{font-size:12px;color:var(--muted);margin-top:4px}
+.rrow .rm b{color:var(--fg);font-weight:800}
+.rrow .radd{margin-top:4px;display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--accent)}
+.rrow .radd svg{width:16px;height:16px}
+
+/* карточка рецепта */
+.recipe-hero{position:relative;height:208px;overflow:hidden;flex:0 0 auto}
+.recipe-hero .rh-f{position:absolute;inset:0}
+.rh-pill{position:absolute;top:16px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in oklab,var(--deep),transparent 30%);backdrop-filter:blur(8px);color:oklch(0.965 0.012 86)}
+.rh-pill.l{left:16px}.rh-pill.r{right:16px}
+.rh-pill svg{width:20px;height:20px}
+.recipe-body{padding:16px 16px 24px;overflow:hidden}
+.recipe-title{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.recipe-meta{display:flex;gap:16px;margin-top:8px;font-family:var(--font-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ai-note{display:flex;gap:12px;margin-top:16px;padding:12px 16px;background:var(--accent-soft);border-radius:var(--r-md);font-size:13px;line-height:1.45;color:color-mix(in oklab,var(--accent),var(--fg) 20%)}
+.ai-note svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px}
+.recipe-tabs{display:flex;gap:24px;margin:16px 0 8px;border-bottom:1px solid var(--border)}
+.recipe-tabs .rt-b{padding:0 0 12px;font-size:14px;font-weight:800;color:var(--muted);position:relative}
+.recipe-tabs .rt-b.on{color:var(--fg)}
+.recipe-tabs .rt-b.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);border-radius:2px}
+.ing-row{display:flex;align-items:center;gap:12px;padding:12px 0}
+.ing-check{width:24px;height:24px;flex:0 0 auto;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--fresh);color:oklch(0.985 0.008 90)}
+.ing-check.no{background:transparent;border:1.5px solid var(--border);color:transparent}
+.ing-check svg{width:16px;height:16px}
+.ing-name{font-size:14px;font-weight:700}
+.ing-name.miss{color:var(--muted)}
+.ing-need{margin-left:auto;font-size:11px;font-weight:800;color:var(--accent);white-space:nowrap}
+.cta-stack{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+
+/* готовка */
+.cook{height:100%;display:flex;flex-direction:column}
+.cook-top{display:flex;align-items:center;justify-content:space-between;padding:56px 16px 0}
+.cook-num{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.cook-num b{color:var(--fg);font-weight:600}
+.cook-x{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--border);color:var(--muted)}
+.cook-x svg{width:20px;height:20px}
+.cook-segs{display:flex;gap:8px;padding:16px 16px 0}
+.cook-segs .seg{flex:1;height:4px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border)}
+.cook-segs .seg.on{background:var(--accent);border-color:var(--accent)}
+.cook-body{flex:1;padding:8px 16px 0;display:flex;flex-direction:column}
+.cook-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cook-text{font-size:24px;font-weight:700;line-height:1.35;letter-spacing:-.015em;margin-top:12px}
+.timer-pill{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;margin-top:24px;padding:8px 16px 8px 8px;border-radius:var(--r-pill);background:var(--surface);border:1px solid var(--border);font-family:var(--font-mono);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 92%)}
+.timer-pill .play{width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--accent-on);display:grid;place-items:center}
+.timer-pill .play svg{width:16px;height:16px;fill:currentColor;stroke:none}
+.cook-hint{margin-top:auto;padding:16px 0 0;font-size:12px;color:var(--muted)}
+.cook-nav{padding:16px;display:flex;gap:12px;align-items:center}
+.cook-back{flex:0 0 auto;width:56px;height:56px;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;color:var(--fg);transition:opacity .2s var(--ease)}
+.cook-back svg{width:20px;height:20px}
+.cook-back[data-disabled="true"]{opacity:.35;pointer-events:none}
+.cook-next{flex:1;height:56px;border-radius:var(--r-md);background:var(--accent);color:var(--accent-on);display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:800}
+.cook-next svg{width:20px;height:20px}
+
+/* списание */
+.used-head{padding:8px 16px}
+.used-head h3{font-size:20px;font-weight:800;letter-spacing:-.015em}
+.used-head .s{font-size:12.5px;color:var(--muted);margin-top:4px}
+.check-row{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer}
+.check-box{width:24px;height:24px;flex:0 0 auto;border-radius:var(--r-sm);border:1.5px solid var(--border);display:grid;place-items:center;color:transparent;transition:all .2s var(--ease)}
+.check-box svg{width:16px;height:16px}
+.is-checked>.check-box,.is-checked .check-box{background:var(--fresh);border-color:var(--fresh);color:oklch(0.985 0.008 90)}
+.check-name{font-size:14px;font-weight:700}
+.is-checked .check-name{color:var(--muted)}
+.check-qty{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.done-note{margin:8px 16px 0;padding:12px 16px;display:flex;align-items:center;gap:12px;background:var(--accent-soft);border-radius:var(--r-md);font-size:12.5px;color:color-mix(in oklab,var(--accent),var(--fg) 20%);line-height:1.4}
+.done-note svg{width:16px;height:16px;flex:0 0 auto}
+.used-list .check-row{padding:12px 16px}
+
+/* план */
+.day-rail{display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none}
+.day-rail::-webkit-scrollbar{display:none}
+.day-pill{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--muted);min-width:44px;transition:all .2s var(--ease)}
+.day-pill .dp-d{font-size:10.5px;font-weight:800}
+.day-pill .dp-n{font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--fg)}
+.day-pill.is-today{background:var(--accent);border-color:var(--accent)}
+.day-pill.is-today .dp-n,.day-pill.is-today .dp-d{color:var(--accent-on)}
+.meal-label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 16px 8px}
+.meal-card{margin:0 16px 12px;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px}
+.meal-card .mf{width:56px;height:56px;flex:0 0 auto;border-radius:12px}
+.meal-card .mt{font-size:14px;font-weight:800}
+.meal-card .mm{font-size:12px;color:var(--muted);margin-top:4px}
+.meal-empty{margin:0 16px 12px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border:2px dashed color-mix(in oklab,var(--fg),transparent 76%);border-radius:var(--r-lg);color:var(--muted);font-size:13.5px;font-weight:700}
+.meal-empty svg{width:16px;height:16px}
+.gen-hero{margin:8px 16px 16px;padding:16px;background:var(--accent-soft);border-radius:var(--r-xl);text-align:center}
+.gen-hero>svg{width:24px;height:24px;color:var(--accent);margin:0 auto 8px}
+.gen-hero h4{font-size:15px;color:color-mix(in oklab,var(--accent),var(--fg) 15%)}
+.gen-hero p{font-size:12.5px;color:color-mix(in oklab,var(--accent),var(--fg) 30%);margin-top:4px;line-height:1.45}
+.gen-hero .btn{margin-top:16px;background:var(--accent);color:var(--accent-on)}
+
+/* покупки */
+.prog-card{margin:0 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
+.prog-card .pt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;font-size:13px;font-weight:800}
+.prog-card .pt .n{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.prog-card .pt .n b{color:var(--accent);font-weight:600}
+.track{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.fill{height:100%;border-radius:99px;background:var(--accent);transition:width .35s var(--ease)}
+.add-row{margin:0 16px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border:2px dashed color-mix(in oklab,var(--fg),transparent 76%);border-radius:var(--r-md);color:var(--muted);font-size:13.5px;font-weight:700}
+.add-row svg{width:16px;height:16px}
+
+/* итог закупки */
+.as-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.as-row:last-child{border-bottom:0}
+.as-row .an{font-size:14px;font-weight:700}
+.as-row .ac{font-size:11px;color:var(--muted);background:var(--surface-2);border-radius:var(--r-pill);padding:4px 12px;font-weight:700}
+.as-row .as-d{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.as-row .as-d b{color:var(--fg);font-weight:600}
+
+/* профиль */
+.prof-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 16px 16px}
+.avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(150deg,color-mix(in oklab,var(--accent),#fff 10%),color-mix(in oklab,var(--late),var(--deep) 16%));display:grid;place-items:center;color:var(--accent-on);font-size:28px;font-weight:800;box-shadow:0 8px 20px -8px color-mix(in oklab,var(--accent),transparent 60%)}
+.prof-name{font-size:20px;font-weight:800;margin-top:12px}
+.prof-mail{font-size:12.5px;color:var(--muted);margin-top:4px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 4px;text-align:center}
+.stat .n{font-family:var(--font-mono);font-size:18px;font-weight:600}
+.stat .n.good{color:color-mix(in oklab,var(--fresh),var(--fg) 20%)}
+.stat .n.bad{color:color-mix(in oklab,var(--late),var(--fg) 12%)}
+.stat .l{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.3}
+.stat-hero{margin:8px 16px 16px;padding:12px 16px;display:flex;align-items:center;gap:12px;background:var(--accent-soft);border-radius:var(--r-lg);font-size:12.5px;color:color-mix(in oklab,var(--accent),var(--fg) 20%);line-height:1.4}
+.stat-hero svg{width:16px;height:16px;flex:0 0 auto}
+.set-list{margin:0 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.set-row{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:14px;font-weight:700}
+.set-row + .set-row{border-top:1px solid var(--border)}
+.set-row .si{width:32px;height:32px;border-radius:10px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;flex:0 0 auto}
+.set-row .si svg{width:16px;height:16px}
+.set-row .sv{margin-left:auto;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;font-weight:700}
+.set-row .sv svg{width:16px;height:16px}
+.set-row.danger .si{background:color-mix(in oklab,var(--late),var(--surface) 86%);color:color-mix(in oklab,var(--late),var(--fg) 20%)}
+.toggle{margin-left:auto;width:44px;height:26px;border-radius:99px;background:var(--border);position:relative;transition:background .2s var(--ease);flex:0 0 auto}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 88%);transition:transform .2s var(--ease)}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{transform:translateX(18px)}
+
+/* welcome / онбординг / авторизация */
+.welcome{height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.w-wash{position:absolute;inset:0;background:radial-gradient(88% 40% at 50% 4%,var(--accent-soft),transparent 70%)}
+.w-top{position:relative;z-index:2;display:flex;justify-content:center;padding:64px 0 0}
+.w-medal{width:152px;height:152px;border-radius:50%;margin:0 auto 32px;position:relative;display:grid;place-items:center;background:var(--surface);border:1px solid var(--border);box-shadow:0 16px 40px -16px color-mix(in oklab,var(--accent),transparent 55%)}
+.w-medal::after{content:"";position:absolute;inset:12px;border-radius:50%;border:2px dashed color-mix(in oklab,var(--fg),transparent 78%)}
+.w-medal img{width:64px;position:relative;z-index:2}
+.w-stage{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px;text-align:center}
+.w-title{font-size:28px;font-weight:800;line-height:1.14;letter-spacing:-.02em;max-width:13ch}
+.w-sub{font-size:14px;color:var(--muted);margin-top:12px;line-height:1.5;max-width:28ch}
+.w-actions{position:relative;z-index:2;padding:0 16px 32px;display:flex;flex-direction:column;gap:12px}
+.au-bar{position:relative;z-index:3;display:flex;align-items:center;gap:12px;padding:56px 16px 0}
+.au-back{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--border);color:var(--fg)}
+.au-back svg{width:20px;height:20px}
+.au-brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px}
+.au-brand .logo-chip{width:28px;height:28px;border-radius:8px}
+.au-brand .logo-chip img{width:16px}
+.au-body{padding:24px 16px 0;flex:1}
+.au-body h2{font-size:24px;letter-spacing:-.02em}
+.au-body .a-sub{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.auth-field{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.auth-field label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pwd{position:relative}
+.pwd .eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;display:grid;place-items:center;color:var(--muted);border-radius:var(--r-sm)}
+.pwd .eye svg{width:20px;height:20px}
+.auth-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px}
+.remember{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:700}
+.chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);display:grid;place-items:center;color:transparent;flex:0 0 auto;background:var(--fg);border-color:var(--fg)}
+.chk svg{width:16px;height:16px}
+.auth-link{color:var(--fg);font-weight:800}
+.auth-link.acc{color:var(--accent)}
+.au-foot{padding:0 16px 32px}
+.oauth{display:flex;gap:12px}
+.oauth-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:1.5px solid var(--border);border-radius:var(--r-md);background:var(--surface);font-size:14px;font-weight:800}
+.oauth-btn .om{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-family:var(--font-mono);font-weight:600;font-size:12px}
+.auth-divider{display:flex;align-items:center;gap:16px;color:var(--muted);font-size:12px;margin:16px 0;font-weight:700}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.auth-switch{text-align:center;font-size:13px;color:var(--muted);margin-top:16px;font-weight:700}
+.auth-switch b{color:var(--fg);font-weight:800}
+.lock-badge{width:64px;height:64px;border-radius:20px;background:var(--accent-soft);color:color-mix(in oklab,var(--accent),var(--fg) 15%);display:grid;place-items:center;margin:8px auto 16px}
+.lock-badge svg{width:28px;height:28px}
+.code-center{text-align:center;padding:8px 16px 0}
+.code-center h2{font-size:24px;letter-spacing:-.02em}
+.code-center .a-sub{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.code-row{display:flex;gap:8px;justify-content:center;padding:0 16px;margin-top:24px}
+.code-box{flex:1;aspect-ratio:3/4;border:1.5px solid var(--border);border-radius:var(--r-md);background:var(--surface);display:grid;place-items:center;font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--fg);max-width:52px}
+.code-box.filled{border-color:var(--fg)}
+.code-box.active{border-color:var(--accent);box-shadow:var(--ring)}
+.code-resend{text-align:center;margin-top:24px;font-size:13.5px;color:var(--muted);padding:0 16px;font-weight:700}
+.code-resend b{color:var(--fg);font-weight:800}
+.ob-opt{margin:0 16px 12px;display:flex;align-items:center;gap:12px;padding:16px;border-radius:var(--r-lg);text-align:left}
+.ob-opt .oi{width:44px;height:44px;flex:0 0 auto;border-radius:12px;display:grid;place-items:center}
+.ob-opt .oi svg{width:20px;height:20px}
+.ob-opt .ot{font-size:14.5px;font-weight:800}
+.ob-opt .od{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
+.ob-opt.primary{background:var(--accent);color:var(--accent-on)}
+.ob-opt.primary .od{color:color-mix(in oklab,var(--accent-on),transparent 25%)}
+.ob-opt.primary .oi{background:color-mix(in oklab,var(--accent-on),transparent 86%);color:var(--accent-on)}
+.ob-opt.secondary{background:var(--surface);border:1px solid var(--border)}
+.ob-opt.secondary .oi{background:var(--accent-soft);color:color-mix(in oklab,var(--accent),var(--fg) 15%)}
+.ob-later{text-align:center;margin-top:8px;font-size:12px;color:var(--muted);font-weight:700}
+.perm-card{margin:0 16px 12px;display:flex;align-items:flex-start;gap:12px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
+.perm-card .pi{width:44px;height:44px;flex:0 0 auto;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:color-mix(in oklab,var(--accent),var(--fg) 15%)}
+.perm-card .pi svg{width:20px;height:20px}
+.perm-card .pt2{font-size:14.5px;font-weight:800}
+.perm-card .pd{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.perm-card .pa{margin-left:auto;flex:0 0 auto}
+.perm-btn{padding:8px 16px;border-radius:var(--r-pill);background:var(--accent);color:var(--accent-on);font-size:12px;font-weight:800}
+.perm-done{display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border-radius:var(--r-pill);background:color-mix(in oklab,var(--fresh),var(--surface) 86%);color:color-mix(in oklab,var(--fresh),var(--fg) 25%);font-size:12px;font-weight:800}
+.perm-done svg{width:16px;height:16px}
+
+/* ── дизайн-система ──────────────────────────────────────────────────── */
+.dsys{padding-block:clamp(40px,6vw,64px);border-top:1px solid var(--border)}
+.dsys h2{font-size:clamp(24px,3vw,34px);letter-spacing:-.02em}
+.dsys .ds-lead{color:var(--muted);margin-top:12px;max-width:62ch;font-size:15px;line-height:1.55}
+.grid-note{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.grid-chip{font-family:var(--font-mono);font-size:12px;font-weight:600;padding:8px 16px;border-radius:var(--r-pill);background:var(--surface);border:1px solid var(--border)}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:16px;margin-top:24px}
+.swatch{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
+.sw-chip{height:64px;border-bottom:1px solid var(--border)}
+.sw-body{padding:12px}
+.sw-name{font-size:13px;font-weight:800}
+.sw-val{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all}
+.sw-role{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.35}
+.typerow{margin-top:24px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
+.typerow .tr{display:flex;align-items:baseline;gap:16px;padding:16px;border-bottom:1px solid var(--border)}
+.typerow .tr:last-child{border-bottom:0}
+.typerow .ex{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.typerow .lab{font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:24px}
+.comp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+.comp-card h4{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.demo{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pagefoot{padding:48px 0 64px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+.pagefoot .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.pagefoot b{color:var(--fg);font-weight:800}
+.pagefoot a{color:var(--accent);font-weight:800}
+
+@media (max-width:720px){
+  .wrap{padding-inline:20px}
+  .topbar-in{padding-block:12px}
+  .brand-sub{display:none}
+  .phone-frame{width:100%;max-width:404px}
+}
+</style>
+</head>
+<body>
+
+<!-- ─────────────── верхняя панель ─────────────── -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <div class="brand">
+      <span class="logo-chip"><img src="public/logo/logo.svg" alt="Логотип PantryChef"></span>
+      <div>
+        <div class="brand-name">Pantry<b>Chef</b></div>
+        <div class="brand-sub">«Тёплая кухня» · прототип v3</div>
+      </div>
+    </div>
+    <div class="theme-toggle" role="group" aria-label="Тема оформления">
+      <button data-theme-btn="light" class="is-on">Светлая</button>
+      <button data-theme-btn="dark">Тёмная</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ─────────────── интро ─────────────── -->
+<section class="intro wrap">
+  <p class="eyebrow">Ревизия v3 · 25 экранов · фирменный логотип</p>
+  <h1>Тёплая кухня, <em>выстроенная по сетке</em>.</h1>
+  <p class="lead">Вернулись к мандарину на креме — дружелюбно и близко к человеку, как и было задумано. Строгость перенесли туда, где она не мешает теплу: единая 8pt-сетка, одна шкала отступов, аккуратный мокап устройства и фирменный логотип на каждом входе.</p>
+  <div class="principles">
+    <span class="principle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>Мандарин и крем</span>
+    <span class="principle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 12.6c-1.8 4.4-8.8 8.9-8.8 8.9s-7-4.5-8.8-8.9a4.9 4.9 0 0 1 8.8-3.8 4.9 4.9 0 0 1 8.8 3.8Z"/></svg>Дружелюбный тон</span>
+    <span class="principle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4h16M4 12h16M4 20h16"/><path d="M9 4v16M15 4v16"/></svg>Сетка 8pt</span>
+    <span class="principle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 3h12M6 21h12M8 3v18M16 3v18"/></svg>Мокап без бардака</span>
+  </div>
+  <div class="pals">
+    <div class="pal">
+      <div class="pal-t">Было · мох на фарфоре</div>
+      <div class="pal-row">
+        <span class="dot" style="background:oklch(0.972 0.007 115)"></span>
+        <span class="dot" style="background:oklch(0.26 0.014 145)"></span>
+        <span class="dot" style="background:oklch(0.50 0.082 152)"></span>
+      </div>
+      <p class="pal-n">Спокойный минимализм — но строгий и отстранённый, как галерея, а не кухня.</p>
+    </div>
+    <div class="pal">
+      <div class="pal-t">Стало · мандарин на креме</div>
+      <div class="pal-row">
+        <span class="dot" style="background:oklch(0.968 0.014 86)"></span>
+        <span class="dot" style="background:oklch(0.30 0.02 50)"></span>
+        <span class="dot" style="background:oklch(0.645 0.135 47)"></span>
+        <span class="dot" style="background:oklch(0.60 0.12 148)"></span>
+        <span class="dot" style="background:oklch(0.585 0.15 30)"></span>
+      </div>
+      <p class="pal-n">Тепло исходной палитры, но глубже мандарин для контраста, тише статусы и единая шкала отступов.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ СТАРТ ═══════════════ -->
+<section class="gallery">
+  <div class="wrap">
+    <div class="flow-head">
+      <div><h2>Старт: знакомство и вход</h2><p>Фирменный логотип на каждом входе, человеческие формулировки, 2FA без нервов.</p></div>
+      <span class="flow-tag">Экраны 01–06</span>
+    </div>
+  </div>
+  <div class="phones">
+
+    <!-- ══ 01 Welcome ══ -->
+    <div class="phone" id="s-welcome">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="welcome">
+          <div class="w-wash"></div>
+          <div class="w-top">
+            <div class="w-medal"><img src="public/logo/logo.svg" alt="Логотип PantryChef"></div>
+          </div>
+          <div class="w-stage">
+            <h1 class="w-title">Кухня, которая знает, что приготовить</h1>
+            <p class="w-sub">Видит, что у вас в холодильнике. Подсказывает ужин. Напоминает, пока продукт не пропал.</p>
+          </div>
+          <div class="w-actions">
+            <button class="btn btn-primary">Начать</button>
+            <button class="btn btn-ghost">У меня есть аккаунт</button>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">01 · Старт</div><div class="pc-t">Welcome</div><div class="pc-d">Логотип в медальоне, тёплый тон с первой секунды</div></div>
+    </div>
+
+    <!-- ══ 02 Вход ══ -->
+    <div class="phone" id="s-login">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="au-bar">
+            <span class="au-brand"><span class="logo-chip"><img src="public/logo/logo.svg" alt=""></span>PantryChef</span>
+          </div>
+          <div class="au-body">
+            <h2>С возвращением</h2>
+            <p class="a-sub">Холодильник скучал. Войдите — и продолжим.</p>
+            <div class="auth-field"><label>Email</label><div class="input"><span class="ph">anna@example.com</span></div></div>
+            <div class="auth-field"><label>Пароль</label><div class="input pwd"><span>••••••••</span><button class="eye" aria-label="Показать пароль"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+            <div class="auth-row">
+              <span class="remember"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="oklch(0.985 0.008 90)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span>Запомнить меня</span>
+              <button class="auth-link">Забыли пароль?</button>
+            </div>
+            <div class="btn-row"><button class="btn btn-primary">Войти</button></div>
+            <div class="auth-divider">или</div>
+            <div class="oauth">
+              <button class="oauth-btn"><span class="om" style="background:var(--surface-2)">G</span>Google</button>
+              <button class="oauth-btn"><span class="om" style="background:var(--accent-soft);color:var(--accent)">Я</span>Яндекс</button>
+            </div>
+            <p class="auth-switch">Нет аккаунта? <b>Создать</b></p>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">02 · Вход</div><div class="pc-t">С возвращением</div><div class="pc-d">Тёплый тон даже в форме входа</div></div>
+    </div>
+
+    <!-- ══ 03 Регистрация ══ -->
+    <div class="phone" id="s-register">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="au-bar">
+            <button class="au-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button>
+            <span class="au-brand"><span class="logo-chip"><img src="public/logo/logo.svg" alt=""></span>PantryChef</span>
+          </div>
+          <div class="au-body">
+            <h2>Создадим аккаунт</h2>
+            <p class="a-sub">Холодильник, план и покупки будут синхронизироваться между вашими устройствами.</p>
+            <div class="auth-field"><label>Имя</label><div class="input"><span class="ph">Как вас зовут?</span></div></div>
+            <div class="auth-field"><label>Email</label><div class="input"><span class="ph">you@example.com</span></div></div>
+            <div class="auth-field"><label>Пароль</label><div class="input pwd"><span class="ph">Минимум 8 символов</span><button class="eye" aria-label="Показать пароль"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+            <div class="btn-row"><button class="btn btn-primary">Создать аккаунт</button></div>
+            <p class="auth-switch">Уже есть аккаунт? <b>Войти</b></p>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">03 · Регистрация</div><div class="pc-t">Три поля — не больше</div><div class="pc-d">Честная подпись: зачем нужен аккаунт</div></div>
+    </div>
+
+    <!-- ══ 04 2FA ══ -->
+    <div class="phone" id="s-2fa">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="au-bar">
+            <button class="au-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button>
+          </div>
+          <div class="code-center">
+            <div class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5M12 14.5v2.5"/></svg></div>
+            <h2>Код подтверждения</h2>
+            <p class="a-sub">Отправили шесть цифр на<br><b>anna@example.com</b></p>
+          </div>
+          <div class="code-row">
+            <span class="code-box filled num">4</span><span class="code-box filled num">7</span><span class="code-box filled num">2</span><span class="code-box filled num">9</span><span class="code-box active"></span><span class="code-box"></span>
+          </div>
+          <p class="code-resend">Отправить снова через <b class="num">0:24</b></p>
+          <div class="au-foot" style="padding-top:24px"><button class="btn btn-primary">Подтвердить</button></div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">04 · 2FA</div><div class="pc-t">Код подтверждения</div><div class="pc-d">Автопереход фокуса, спокойный таймер</div></div>
+    </div>
+
+    <!-- ══ 05 Разрешения ══ -->
+    <div class="phone" id="s-perms">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="au-bar"><button class="au-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button></div>
+          <div class="au-body" style="padding-bottom:0">
+            <h2>Настроим под себя</h2>
+            <p class="a-sub">Два разрешения — каждое с объяснением, зачем оно.</p>
+          </div>
+          <div style="height:16px"></div>
+          <div class="perm-card">
+            <span class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 5.5 7 8H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-2l-1.5-2.5h-7Z"/><circle cx="12" cy="13.5" r="3.2"/></svg></span>
+            <div><div class="pt2">Камера</div><div class="pd">Для сканера штрих-кодов и фото полок — продукты появятся сами.</div></div>
+            <span class="pa perm-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg>Включено</span>
+          </div>
+          <div class="perm-card">
+            <span class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4.2 1.7 5.5 1.7 5.5H4.8s1.7-1.3 1.7-5.5Z"/><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0"/></svg></span>
+            <div><div class="pt2">Уведомления</div><div class="pd">Скажем, что спасаем, до того как станет поздно. Без спама.</div></div>
+            <span class="pa"><button class="perm-btn">Включить</button></span>
+          </div>
+          <div class="au-foot" style="padding-top:8px">
+            <div class="btn-row" style="margin-top:8px"><button class="btn btn-primary">Продолжить</button></div>
+            <p class="ob-later">Пока не сейчас — всё можно включить в настройках.</p>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">05 · Разрешения</div><div class="pc-t">Каждое — с объяснением</div><div class="pc-d">Отказ ничего не блокирует</div></div>
+    </div>
+
+    <!-- ══ 06 Наполнение ══ -->
+    <div class="phone" id="s-fill">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="au-bar"><button class="au-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button></div>
+          <div class="au-body" style="padding-bottom:0"><h2>Наполним холодильник</h2></div>
+          <div class="gen-hero" style="margin-top:16px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 5.5 7 8H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-2l-1.5-2.5h-7Z"/><circle cx="12" cy="13.5" r="3.2"/></svg>
+            <h4>Один снимок полки — и продукты сами появятся в списке</h4>
+            <p>Дальше — идеи ужина из того, что реально есть. Без продуктов они будут случайными.</p>
+          </div>
+          <div class="ob-opt primary">
+            <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg></span>
+            <div><div class="ot">Сфотографировать полки</div><div class="od">Распознаем и предложим подтвердить</div></div>
+          </div>
+          <div class="ob-opt secondary">
+            <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+            <div><div class="ot">Добавить по одному</div><div class="od">Полминуты на продукт</div></div>
+          </div>
+          <p class="ob-later">Позже — но без продуктов идеи будут случайными.</p>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">06 · Первый шаг</div><div class="pc-t">Наполнение</div><div class="pc-d">Путь к вау-моменту — первой идее ужина</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ ГЛАВНАЯ И ХОЛОДИЛЬНИК ═══════════════ -->
+<section class="gallery">
+  <div class="wrap">
+    <div class="flow-head">
+      <div><h2>Главная «Сегодня» и холодильник</h2><p>Открывают приложение — видят «что сегодня»: быстрые действия, спасаемое, идеи, сводка. Холодильник — рабочий инструмент рядом.</p></div>
+      <span class="flow-tag">Экраны 07–13</span>
+    </div>
+  </div>
+  <div class="phones">
+
+    <!-- ══ 07 Главная ══ -->
+    <div class="phone" id="s-home">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stwrap stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div><div class="t">Привет, Анна</div><div class="s">Четверг, 9 октября · что готовим?</div></div>
+            <div class="head-actions">
+              <button class="icon-btn" aria-label="Уведомления"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4.2 1.7 5.5 1.7 5.5H4.8s1.7-1.3 1.7-5.5Z"/><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0"/></svg><span class="idot"></span></button>
+              <button class="avatar-s" aria-label="Профиль">А</button>
+            </div>
+          </div>
+          <div class="rescue">
+            <span class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+            <div>
+              <div class="rt">3 продукта просят внимания</div>
+              <div class="mini-chips"><span class="mini-chip">сметана</span><span class="mini-chip">черри</span><span class="mini-chip">зелень</span></div>
+            </div>
+            <span class="r-go">Что с ними<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span>
+          </div>
+          <div style="height:16px"></div>
+          <div class="qactions">
+            <button class="qaction"><span class="qa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg></span><span>Сканер</span></button>
+            <button class="qaction"><span class="qa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span><span>Добавить</span></button>
+            <button class="qaction"><span class="qa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9l4.4 1.6L13.6 12 12 16.5 10.4 12 6 10.6 10.4 9 12 4.5Z"/></svg></span><span>Идеи</span></button>
+            <button class="qaction"><span class="qa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span>План</span></button>
+          </div>
+          <div class="section-label">Что приготовить сегодня <span class="sl-n">из ваших</span></div>
+          <div class="stack">
+            <div class="idea">
+              <span class="if" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--soon),#fff 30%), transparent 60%),linear-gradient(140deg,oklch(0.85 0.07 70),oklch(0.72 0.08 52))"></span>
+              <div class="ib"><div class="it">Паста с курицей и черри</div><div class="im"><span class="num">30 мин</span> · 6 из 7 ваших <span class="badge badge-late">спасает черри</span></div></div>
+              <button class="ia" aria-label="Другая идея"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6l2.5 2.4"/><path d="M20.5 4v4.4h-4.4"/></svg></button>
+            </div>
+            <div class="idea">
+              <span class="if" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--soon),#fff 36%), transparent 60%),linear-gradient(140deg,oklch(0.89 0.06 88),oklch(0.78 0.07 74))"></span>
+              <div class="ib"><div class="it">Сырники со сметаной</div><div class="im"><span class="num">25 мин</span> · 4 из 5 ваших <span class="badge badge-late">спасает сметану</span></div></div>
+              <button class="ia" aria-label="Другая идея"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6l2.5 2.4"/><path d="M20.5 4v4.4h-4.4"/></svg></button>
+            </div>
+            <div class="idea">
+              <span class="if" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--fresh),#fff 36%), transparent 60%),linear-gradient(140deg,oklch(0.84 0.08 146),oklch(0.72 0.09 152))"></span>
+              <div class="ib"><div class="it">Зелёный салат с огурцом</div><div class="im"><span class="num">10 мин</span> · 3 из 3 ваших</div></div>
+              <button class="ia" aria-label="Другая идея"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6l2.5 2.4"/><path d="M20.5 4v4.4h-4.4"/></svg></button>
+            </div>
+            <div class="link-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg>Все рецепты из холодильника<span class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+          </div>
+          <div class="section-label">Холодильник</div>
+          <div class="sum-card">
+            <div class="sum-top"><span class="st">21 продукт</span><span class="sa">Открыть<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="sum-nums">
+              <div class="snum warn"><div class="n">3</div><div class="l">спасаем</div></div>
+              <div class="snum mid"><div class="n">2</div><div class="l">скоро</div></div>
+              <div class="snum ok"><div class="n">16</div><div class="l">свежо</div></div>
+            </div>
+          </div>
+          <div class="section-label" style="margin-top:16px">Покупки</div>
+          <div class="link-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11.5 8.6 5M19 11.5 15.4 5"/><path d="M3.5 11.5h17l-1.5 6.6a2 2 0 0 1-2 1.6H7a2 2 0 0 1-2-1.6Z"/></svg>Список покупок<span class="n"><span class="num">7 позиций</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="tab-bar">
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tb">7</span><span class="tl">План</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">07 · Главная</div><div class="pc-t">«Сегодня»</div><div class="pc-d">Быстрые действия, спасаемое, идеи и сводка — один экран</div></div>
+    </div>
+
+    <!-- ══ 08 Холодильник ══ -->
+    <div class="phone" id="s-fridge">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stwrap stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div><div class="t">Холодильник</div><div class="s"><span class="num">21</span> продукт</div></div>
+            <div class="head-actions">
+              <button class="icon-btn" aria-label="Сканер"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg></button>
+              <button class="icon-btn accent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+            </div>
+          </div>
+          <div class="rescue" style="padding:12px 16px">
+            <span class="ri" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+            <span class="rt" style="font-size:13px">3 продукта просят внимания</span>
+            <span class="r-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span>
+          </div>
+          <div style="height:12px"></div>
+          <div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>Найти продукт</div>
+          <div class="chip-row">
+            <button data-chip class="is-active">Все</button>
+            <button data-chip>Спасаем</button>
+            <button data-chip>Скоро</button>
+            <button data-chip>Просрочено</button>
+            <button data-chip>Молочное</button>
+            <button data-chip>Овощи</button>
+            <button data-chip>Мясо</button>
+          </div>
+          <div class="pgroup">
+            <div class="prow"><span class="ptile t-dairy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span><span class="pname">Сметана 10%</span><span class="leader"></span><span class="pqty">300 г</span><span class="badge badge-late">сегодня</span></div>
+            <div class="prow"><span class="ptile t-dairy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span><span class="pname">Творог 5%</span><span class="leader"></span><span class="pqty">200 г</span><span class="badge badge-soon">2 дня</span></div>
+            <div class="prow"><span class="ptile t-dairy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span><span class="pname">Молоко 2,5%</span><span class="leader"></span><span class="pqty">1 л</span><span class="badge badge-fresh">5 дней</span></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="pgroup">
+            <div class="prow"><span class="ptile t-greens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19c3-5 7-8 11-9.5"/></svg></span><span class="pname">Помидоры черри</span><span class="leader"></span><span class="pqty">250 г</span><span class="badge badge-late">завтра</span></div>
+            <div class="prow"><span class="ptile t-greens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19c3-5 7-8 11-9.5"/></svg></span><span class="pname">Зелень, укроп</span><span class="leader"></span><span class="pqty">1 пуч.</span><span class="badge badge-late">сегодня</span></div>
+            <div class="prow"><span class="ptile t-greens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19c3-5 7-8 11-9.5"/></svg></span><span class="pname">Огурцы</span><span class="leader"></span><span class="pqty">4 шт</span><span class="badge badge-fresh">6 дней</span></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="pgroup">
+            <div class="prow"><span class="ptile t-meat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4a4.5 4.5 0 0 1 4.5 4.5C20 11 18 13 15.5 13L11 17.5 9.5 16 5 20.5 3.5 19 8 14.5 6.5 13 11 8.5C11 6 13 4 15.5 4Z"/></svg></span><span class="pname">Курица, филе</span><span class="leader"></span><span class="pqty">400 г</span><span class="badge badge-soon">2 дня</span></div>
+            <div class="prow"><span class="ptile t-pantry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10M8 6.5h8c.8 1 1 1.7 1 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9.5c0-1.3.2-2 1-3Z"/></svg></span><span class="pname">Паста пенне</span><span class="leader"></span><span class="pqty">500 г</span><span class="badge badge-fresh">год</span></div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="tab-bar">
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tb">7</span><span class="tl">План</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">08 · Холодильник</div><div class="pc-t">Рабочий инвентарь</div><div class="pc-d">Строки «как чек», фильтры, свайпы</div></div>
+    </div>
+
+    <!-- ══ 09 Пусто ══ -->
+    <div class="phone" id="s-empty">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div><div class="t">Холодильник</div><div class="s"><span class="num">0</span> продуктов</div></div>
+            <div class="head-actions">
+              <button class="icon-btn" aria-label="Сканер"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg></button>
+              <button class="icon-btn accent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button>
+            </div>
+          </div>
+          <div class="empty">
+            <span class="e-ic"><img src="public/logo/logo.svg" alt=""></span>
+            <h2>Холодильник пуст</h2>
+            <p>Это легко исправить. Добавьте первый продукт — и появятся идеи ужина.</p>
+            <div class="e-actions">
+              <button class="btn btn-primary">Сфотографировать полки</button>
+              <button class="btn btn-secondary">Добавить вручную</button>
+            </div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tl">План</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">09 · Пусто</div><div class="pc-t">Приглашение к действию</div><div class="pc-d">Логотип вместо грустной иллюстрации</div></div>
+    </div>
+
+    <!-- ══ 10 Быстрый ввод ══ -->
+    <div class="phone" id="s-add">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="sheet-dim"></div>
+          <div class="sheet">
+            <div class="grabber"></div>
+            <h3>Добавить продукт</h3>
+            <div class="sh-sub">Пять секунд — остальное подставим сами</div>
+            <div class="field">
+              <label>Продукт</label>
+              <div class="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>Йогурт<span class="caret"></span></div>
+            </div>
+            <div class="mini-chips" style="margin-top:12px">
+              <span class="mini-chip">Йогурт</span><span class="mini-chip">Хлеб</span><span class="mini-chip">Бананы</span><span class="mini-chip">Яйца</span>
+            </div>
+            <div class="row-line"><span class="rl-k">Категория</span><span class="rl-v">Молочное</span><span class="rl-a">поменять<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="row-line"><span class="rl-k">Срок</span><span class="rl-v num">ср, 8 окт</span><span class="rl-a">типичный<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="row-line"><span class="rl-k">Количество</span><span class="stepper" style="margin-left:auto"><button aria-label="Меньше"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5.5 12h13"/></svg></button><span class="stv">2 шт</span><button aria-label="Больше"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button></span></div>
+            <div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9l4.4 1.6L13.6 12 12 16.5 10.4 12 6 10.6 10.4 9 12 4.5Z"/></svg>Срок типичный для молочного — можно поменять или забыть о нём.</div>
+            <div class="btn-row">
+              <button class="btn btn-primary">Добавить ещё</button>
+              <button class="btn btn-ghost">Готово</button>
+            </div>
+          </div>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">10 · Ввод</div><div class="pc-t">Быстрый ввод</div><div class="pc-d">Ничего не обязательно — догадаемся сами</div></div>
+    </div>
+
+    <!-- ══ 11 Карточка продукта ══ -->
+    <div class="phone" id="s-product">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="sheet-dim"></div>
+          <div class="sheet">
+            <div class="grabber"></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span class="ptile t-dairy" style="width:48px;height:48px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span>
+              <div style="flex:1"><h3 style="font-size:18px">Сметана 10%</h3><div style="margin-top:4px"><span class="badge badge-late">спасаем · сегодня</span></div></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="row-line"><span class="rl-k">Категория</span><span class="rl-v">Молочное</span><span class="rl-a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="row-line"><span class="rl-k">Количество</span><span class="stepper" style="margin-left:auto"><button aria-label="Меньше"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5.5 12h13"/></svg></button><span class="stv">300 г</span><button aria-label="Больше"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button></span></div>
+            <div class="row-line"><span class="rl-k">Срок</span><span class="rl-v num">сегодня</span><span class="rl-a">типичный<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="seg3" data-seg><button>Морозилка</button><button class="on">Холодильник</button><button>Кладовая</button></div>
+            <div class="action-tiles">
+              <button class="atile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9l4.4 1.6L13.6 12 12 16.5 10.4 12 6 10.6 10.4 9 12 4.5Z"/></svg>Использовать</button>
+              <button class="atile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9"/></svg>Заморозить</button>
+              <button class="atile warm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg>Списать</button>
+            </div>
+            <div class="btn-row"><button class="btn btn-primary">Сохранить</button></div>
+          </div>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">11 · Продукт</div><div class="pc-t">Карточка продукта</div><div class="pc-d">Правки, заморозка и списание — в одном месте</div></div>
+    </div>
+
+    <!-- ══ 12 Сканер ══ -->
+    <div class="phone" id="s-scan">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="scan">
+          <div class="scan-feed"></div><div class="scan-vig"></div>
+          <div class="scan-top">
+            <button class="scan-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg></button>
+            <div class="scan-seg" data-seg><button class="on">Штрих-код</button><button>Фото полок</button></div>
+            <span style="width:40px"></span>
+          </div>
+          <div class="scan-frame"><div class="box">
+            <span class="crn tl"></span><span class="crn tr"></span><span class="crn bl"></span><span class="crn br"></span>
+            <div class="scan-hint">Наведите на штрих-код упаковки</div>
+          </div></div>
+          <div class="scan-bottom">
+            <button class="capture"><span class="inner"></span></button>
+            <span class="scan-mode">Штрих-код распознаётся мгновенно</span>
+          </div>
+        </div></div>
+        <div class="home-ind" style="background:color-mix(in oklab,oklch(0.965 0.012 86),transparent 55%)"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">12 · Сканер</div><div class="pc-t">Два режима</div><div class="pc-d">Режим ввода, а не вкладка</div></div>
+    </div>
+
+    <!-- ══ 13 Результаты скана ══ -->
+    <div class="phone" id="s-scanres">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="rs-head">
+            <button class="icon-btn" style="width:36px;height:36px" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg></button>
+            <div class="t">Нашли <span class="num">6</span> продуктов</div>
+            <button class="rs-link">Переснять</button>
+          </div>
+          <div class="rs-grid">
+            <div class="rs-card is-checked" data-check><span class="rt-t t-dairy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span><span class="rn"><span class="nm">Молоко</span><span class="cf">99%</span></span><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span></div>
+            <div class="rs-card is-checked" data-check><span class="rt-t t-dairy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span><span class="rn"><span class="nm">Сметана</span><span class="cf">97%</span></span><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span></div>
+            <div class="rs-card is-checked" data-check><span class="rt-t t-fruit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="16.5" r="3.4"/><circle cx="16.5" cy="15" r="2.9"/><path d="M9.3 13.6C10.5 9.5 13 6.5 17 5M16 12.2c.3-2.8 1-5 1-7.2"/></svg></span><span class="rn"><span class="nm">Черри</span><span class="cf">95%</span></span><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span></div>
+            <div class="rs-card is-checked" data-check><span class="rt-t t-pantry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10M8 6.5h8c.8 1 1 1.7 1 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9.5c0-1.3.2-2 1-3Z"/></svg></span><span class="rn"><span class="nm">Хлеб</span><span class="cf">93%</span></span><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span></div>
+            <div class="rs-card is-checked" data-check><span class="rt-t t-dairy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2c0 .8.3 1.2.8 1.8.8 1 1.2 1.8 1.2 3V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8c0-1.2.4-2 1.2-3 .5-.6.8-1 .8-1.8Z"/></svg></span><span class="rn"><span class="nm">Сыр гауда</span><span class="cf">88%</span></span><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span></div>
+            <div class="rs-card is-dim" data-check><span class="rt-t t-greens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19c3-5 7-8 11-9.5"/></svg></span><span class="rn"><span class="nm">Зелень?</span><span class="cf">61% · уточните</span></span><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span></div>
+          </div>
+          <div class="rs-foot">
+            <button class="btn btn-primary">Добавить выбранное (<span class="num">5</span>)</button>
+            <button class="btn btn-ghost">Ничего не добавлять</button>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">13 · Результаты</div><div class="pc-t">Подтверждение</div><div class="pc-d">Сомнительное снято с выбора — решаете вы</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ РЕЦЕПТЫ И ГОТОВКА ═══════════════ -->
+<section class="gallery">
+  <div class="wrap">
+    <div class="flow-head">
+      <div><h2>От идеи до чистой сковороды</h2><p>AI объясняет «почему», готовка заканчивается списанием — данные не протухают.</p></div>
+      <span class="flow-tag">Экраны 14–18</span>
+    </div>
+  </div>
+  <div class="phones">
+
+    <!-- ══ 14 Рецепты ══ -->
+    <div class="phone" id="s-recipes">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stwrap stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head"><div><div class="t">Рецепты</div><div class="s">Под ваш холодильник</div></div>
+            <button class="icon-btn" aria-label="Поиск"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg></button>
+          </div>
+          <div class="segbar" data-seg><button class="on">Из холодильника</button><button>Поиск</button><button>Избранное</button></div>
+          <div class="chip-row">
+            <button data-chip class="is-active">Любое время</button>
+            <button data-chip>До 30 мин</button>
+            <button data-chip>Вегетарианское</button>
+            <button data-chip>Итальянская</button>
+          </div>
+          <div class="section-label">Идеи на сегодня <span class="sl-n">3</span></div>
+          <div class="stack">
+            <div class="idea">
+              <span class="if" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--soon),#fff 30%), transparent 60%),linear-gradient(140deg,oklch(0.85 0.07 70),oklch(0.72 0.08 52))"></span>
+              <div class="ib"><div class="it">Паста с курицей и черри</div><div class="im"><span class="num">30 мин</span> · 6 из 7 <span class="badge badge-late">спасает черри</span></div></div>
+              <button class="ia" aria-label="Открыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></button>
+            </div>
+            <div class="idea">
+              <span class="if" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--soon),#fff 36%), transparent 60%),linear-gradient(140deg,oklch(0.89 0.06 88),oklch(0.78 0.07 74))"></span>
+              <div class="ib"><div class="it">Сырники со сметаной</div><div class="im"><span class="num">25 мин</span> · 4 из 5 <span class="badge badge-late">спасает сметану</span></div></div>
+              <button class="ia" aria-label="Открыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></button>
+            </div>
+            <div class="idea">
+              <span class="if" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--fresh),#fff 36%), transparent 60%),linear-gradient(140deg,oklch(0.84 0.08 146),oklch(0.72 0.09 152))"></span>
+              <div class="ib"><div class="it">Зелёный салат с огурцом</div><div class="im"><span class="num">10 мин</span> · 3 из 3</div></div>
+              <button class="ia" aria-label="Открыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="section-label">Остальное из ваших продуктов</div>
+          <div class="stack">
+            <div class="rrow">
+              <span class="rf" style="background:linear-gradient(140deg,oklch(0.88 0.05 96),oklch(0.78 0.055 84))"></span>
+              <div class="rb"><div class="rt">Омлет с укропом</div><div class="rm"><span class="num">10 мин</span> · 3 из 3 ваших</div></div>
+            </div>
+            <div class="rrow">
+              <span class="rf" style="background:linear-gradient(140deg,oklch(0.83 0.055 44),oklch(0.72 0.06 34))"></span>
+              <div class="rb"><div class="rt">Курица в сливках</div><div class="rm"><span class="num">40 мин</span> · 5 из 6 · не хватает: <b>сливки</b></div><button class="radd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>сливки — в покупки</button></div>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="tab-bar">
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tb">7</span><span class="tl">План</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">14 · Рецепты</div><div class="pc-t">Из холодильника — по умолчанию</div><div class="pc-d">Недостающее — в покупки одним тапом</div></div>
+    </div>
+
+    <!-- ══ 15 Поиск рецептов ══ -->
+    <div class="phone" id="s-rsearch">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div style="display:flex;align-items:center;gap:12px"><button class="icon-btn" style="width:36px;height:36px" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button><div class="t" style="font-size:20px">Поиск</div></div>
+          </div>
+          <div class="search-bar" style="color:var(--fg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>курица<span class="caret"></span></div>
+          <div class="chip-row" style="margin-top:8px">
+            <button data-chip class="is-active">Все</button>
+            <button data-chip>До 30 мин</button>
+            <button data-chip>Супы</button>
+            <button data-chip>В духовке</button>
+          </div>
+          <div class="section-label">Нашли <span class="sl-n">12 рецептов</span></div>
+          <div class="stack">
+            <div class="rrow">
+              <span class="rf" style="background:linear-gradient(140deg,oklch(0.83 0.055 44),oklch(0.72 0.06 34))"></span>
+              <div class="rb"><div class="rt">Курица в сливках</div><div class="rm"><span class="num">40 мин</span> · 5 из 6 · не хватает: <b>сливки</b></div><button class="radd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>сливки — в покупки</button></div>
+            </div>
+            <div class="rrow">
+              <span class="rf" style="background:linear-gradient(140deg,oklch(0.87 0.06 80),oklch(0.76 0.065 66))"></span>
+              <div class="rb"><div class="rt">Куриный суп с лапшой</div><div class="rm"><span class="num">50 мин</span> · 6 из 6 ваших</div></div>
+            </div>
+            <div class="rrow">
+              <span class="rf" style="background:linear-gradient(140deg,oklch(0.85 0.07 70),oklch(0.72 0.08 52))"></span>
+              <div class="rb"><div class="rt">Паста с курицей и черри</div><div class="rm"><span class="num">30 мин</span> · 6 из 7 · <span class="badge badge-late">спасает черри</span></div></div>
+            </div>
+            <div class="rrow">
+              <span class="rf" style="background:linear-gradient(140deg,oklch(0.84 0.08 146),oklch(0.72 0.09 152))"></span>
+              <div class="rb"><div class="rt">Курица с брокколи</div><div class="rm"><span class="num">35 мин</span> · 4 из 5 · не хватает: <b>брокколи</b></div><button class="radd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>брокколи — в покупки</button></div>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">15 · Поиск</div><div class="pc-t">Ищет и в рецептах, и в продуктах</div><div class="pc-d">Покрытие ваших продуктов — у каждой карточки</div></div>
+    </div>
+
+    <!-- ══ 16 Карточка рецепта ══ -->
+    <div class="phone" id="s-recipe">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="recipe-hero">
+            <span class="rh-f" style="background:radial-gradient(80% 70% at 30% 26%, color-mix(in oklab,var(--soon),#fff 34%), transparent 62%),radial-gradient(70% 70% at 74% 70%, color-mix(in oklab,var(--late),#fff 60%), transparent 60%),linear-gradient(140deg,oklch(0.85 0.07 70),oklch(0.70 0.075 48))"></span>
+            <button class="rh-pill l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button>
+            <button class="rh-pill r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 12.6c-1.8 4.4-8.8 8.9-8.8 8.9s-7-4.5-8.8-8.9a4.9 4.9 0 0 1 8.8-3.8 4.9 4.9 0 0 1 8.8 3.8Z"/></svg></button>
+          </div>
+          <div class="recipe-body">
+            <div class="recipe-title">Паста с курицей и черри</div>
+            <div class="recipe-meta"><span>30 мин</span><span>2 порции</span><span>просто</span></div>
+            <div class="ai-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9l4.4 1.6L13.6 12 12 16.5 10.4 12 6 10.6 10.4 9 12 4.5Z"/></svg>Готовим, потому что у вас истекают черри, а курица ждёт со вчерашней закупки.</div>
+            <div class="recipe-tabs"><button class="rt-b on">Ингредиенты</button><button class="rt-b">Шаги</button></div>
+            <div class="ing-row"><span class="ing-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="ing-name">Курица, филе</span><span class="leader"></span><span class="pqty">400 г</span></div>
+            <div class="ing-row"><span class="ing-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="ing-name">Паста пенне</span><span class="leader"></span><span class="pqty">200 г</span></div>
+            <div class="ing-row"><span class="ing-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="ing-name">Помидоры черри</span><span class="leader"></span><span class="pqty">150 г</span></div>
+            <div class="ing-row"><span class="ing-check no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="ing-name miss">Пармезан</span><span class="leader"></span><span class="pqty">30 г</span><span class="ing-need">в покупки</span></div>
+            <div class="ing-row"><span class="ing-check no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="ing-name miss">Базилик</span><span class="leader"></span><span class="pqty">5 г</span><span class="ing-need">в покупки</span></div>
+            <div class="cta-stack">
+              <button class="btn btn-primary">Готовить<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+              <button class="btn btn-secondary">Запланировать на другой день</button>
+            </div>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">16 · Рецепт</div><div class="pc-t">С объяснением «почему»</div><div class="pc-d">AI не колдует — называет причину</div></div>
+    </div>
+
+    <!-- ══ 17 Готовка ══ -->
+    <div class="phone" id="s-cook">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="cook">
+          <div class="cook-top">
+            <span class="cook-num" id="cookNum"><b>3</b> / 4</span>
+            <button class="cook-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg></button>
+          </div>
+          <div class="cook-segs" id="cookSegs">
+            <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span>
+          </div>
+          <div class="cook-body">
+            <span class="cook-label">Шаг</span>
+            <p class="cook-text" id="cookText">Обжарьте курицу на оливковом масле 6–7 минут, до румяной корочки.</p>
+            <div class="timer-pill" id="cookTimer"><span class="play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></svg></span>07:00</div>
+            <p class="cook-hint">Таймеры продолжают тикать между шагами. Экран не гаснет.</p>
+          </div>
+          <div class="cook-nav">
+            <button class="cook-back" id="cookPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button>
+            <button class="cook-next" id="cookNext">Готово →</button>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">17 · Готовка</div><div class="pc-t">Один шаг — один экран</div><div class="pc-d">Кнопки работают: листайте шаги</div></div>
+    </div>
+
+    <!-- ══ 18 Списание ══ -->
+    <div class="phone" id="s-used">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="used-head">
+            <h3>Что использовали?</h3>
+            <div class="s">Отметьте — спишем из холодильника сами</div>
+          </div>
+          <div class="used-list">
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Курица, филе</span><span class="check-qty">400 г</span></div>
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Паста пенне</span><span class="check-qty">200 г</span></div>
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Помидоры черри</span><span class="check-qty">150 г</span></div>
+            <div class="check-row" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Сметана 10%</span><span class="check-qty">100 г</span></div>
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Масло оливковое</span><span class="check-qty">2 ст. л.</span></div>
+          </div>
+          <div class="done-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/></svg>Холодильник обновится сам. Сметану не отметили — она дождётся сырников.</div>
+          <div class="cta-stack" style="margin:16px 16px 0">
+            <button class="btn btn-primary">Списать и завершить</button>
+            <button class="btn btn-ghost">Готовить снова когда-нибудь</button>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">18 · Списание</div><div class="pc-t">Финал готовки</div><div class="pc-d">Всё отмечено заранее — подтверждение за тап</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ ПЛАН И ПОКУПКИ ═══════════════ -->
+<section class="gallery">
+  <div class="wrap">
+    <div class="flow-head">
+      <div><h2>План недели и магазин</h2><p>План порождает список — живут на одной вкладке. От «купили» до «есть дома» — один экран.</p></div>
+      <span class="flow-tag">Экраны 19–22</span>
+    </div>
+  </div>
+  <div class="phones">
+
+    <!-- ══ 19 План недели ══ -->
+    <div class="phone" id="s-plan">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stwrap stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head"><div><div class="t">План</div><div class="s">Неделя <span class="num">6–12</span> октября</div></div></div>
+          <div class="segbar" data-seg><button class="on">План</button><button>Покупки</button></div>
+          <div style="height:16px"></div>
+          <div class="day-rail" data-day>
+            <button class="day-pill"><span class="dp-d">пн</span><span class="dp-n">6</span></button>
+            <button class="day-pill"><span class="dp-d">вт</span><span class="dp-n">7</span></button>
+            <button class="day-pill"><span class="dp-d">ср</span><span class="dp-n">8</span></button>
+            <button class="day-pill is-today"><span class="dp-d">чт</span><span class="dp-n">9</span></button>
+            <button class="day-pill"><span class="dp-d">пт</span><span class="dp-n">10</span></button>
+            <button class="day-pill"><span class="dp-d">сб</span><span class="dp-n">11</span></button>
+            <button class="day-pill"><span class="dp-d">вс</span><span class="dp-n">12</span></button>
+          </div>
+          <div class="meal-label">Обед</div>
+          <div class="meal-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>Добавить</div>
+          <div class="meal-label">Ужин</div>
+          <div class="meal-card">
+            <span class="mf" style="background:radial-gradient(70% 70% at 30% 28%, color-mix(in oklab,var(--soon),#fff 30%), transparent 60%),linear-gradient(140deg,oklch(0.85 0.07 70),oklch(0.72 0.08 52))"></span>
+            <div><div class="mt">Паста с курицей и черри</div><div class="mm"><span class="num">30 мин</span> · 2 порции · из холодильника</div></div>
+          </div>
+          <div class="gen-hero">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9l4.4 1.6L13.6 12 12 16.5 10.4 12 6 10.6 10.4 9 12 4.5Z"/></svg>
+            <h4>Заполнить неделю из холодильника</h4>
+            <p>Подберём блюда на каждый вечер и поставим скоропортящееся первым.</p>
+            <button class="btn">Сгенерировать план</button>
+          </div>
+          <div class="link-row" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11.5 8.6 5M19 11.5 15.4 5"/><path d="M3.5 11.5h17l-1.5 6.6a2 2 0 0 1-2 1.6H7a2 2 0 0 1-2-1.6Z"/></svg>Список покупок на неделю<span class="n"><span class="num">14 позиций</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+        </div></div>
+        <div class="tab-bar">
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tb">7</span><span class="tl">План</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">19 · План</div><div class="pc-t">Неделя одним нажатием</div><div class="pc-d">Учитывает, что испортится к конкретному дню</div></div>
+    </div>
+
+    <!-- ══ 20 Выбор в слот ══ -->
+    <div class="phone" id="s-slot">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div style="display:flex;align-items:center;gap:12px"><button class="icon-btn" style="width:36px;height:36px" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button><div><div class="t" style="font-size:20px">Ужин · четверг</div><div class="s">Что приготовить 10 октября</div></div></div>
+          </div>
+          <div class="section-label" style="margin-top:8px">Предлагаем на этот день <span class="sl-n">учитываем сроки</span></div>
+          <div class="stack">
+            <div class="idea">
+              <span class="if" style="background:linear-gradient(140deg,oklch(0.84 0.08 146),oklch(0.72 0.09 152))"></span>
+              <div class="ib"><div class="it">Рыба с овощами на пару</div><div class="im"><span class="num">25 мин</span> · черри как раз доживут</div></div>
+              <button class="ia" aria-label="Выбрать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></button>
+            </div>
+            <div class="idea">
+              <span class="if" style="background:linear-gradient(140deg,oklch(0.87 0.05 96),oklch(0.78 0.055 84))"></span>
+              <div class="ib"><div class="it">Гречка с грибами</div><div class="im"><span class="num">20 мин</span> · 4 из 5 ваших</div></div>
+              <button class="ia" aria-label="Выбрать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="section-label">Из избранного</div>
+          <div class="stack">
+            <div class="idea">
+              <span class="if" style="background:linear-gradient(140deg,oklch(0.85 0.07 70),oklch(0.72 0.08 52))"></span>
+              <div class="ib"><div class="it">Паста с курицей и черри</div><div class="im"><span class="num">30 мин</span> · любимое</div></div>
+              <button class="ia" aria-label="Выбрать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></button>
+            </div>
+            <div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>Найти рецепт</div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">20 · Слот</div><div class="pc-t">Выбор блюда на день</div><div class="pc-d">Предложения учитывают сроки к этому дню</div></div>
+    </div>
+
+    <!-- ══ 21 Покупки ══ -->
+    <div class="phone" id="s-shop">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stwrap stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head"><div><div class="t">Покупки</div><div class="s">На неделю, по отделам</div></div></div>
+          <div class="segbar" data-seg><button>План</button><button class="on">Покупки</button></div>
+          <div style="height:16px"></div>
+          <div class="prog-card">
+            <div class="pt">Отметили <span class="n"><b>3</b> из <span class="num">8</span></span></div>
+            <div class="track"><div class="fill" style="width:38%"></div></div>
+          </div>
+          <div class="section-label">Овощи и фрукты</div>
+          <div class="pgroup">
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Помидоры черри</span><span class="check-qty">1 уп.</span></div>
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Огурцы</span><span class="check-qty">400 г</span></div>
+            <div class="check-row" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Бананы</span><span class="check-qty">1 кг</span></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="section-label" style="margin-top:0">Молочное</div>
+          <div class="pgroup">
+            <div class="check-row is-checked" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Молоко 2,5%</span><span class="check-qty">1 л</span></div>
+            <div class="check-row" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Творог 5%</span><span class="check-qty">200 г</span></div>
+            <div class="check-row" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Сливки 20%</span><span class="check-qty">200 мл</span></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="section-label" style="margin-top:0">Бакалея</div>
+          <div class="pgroup">
+            <div class="check-row" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Паста пенне</span><span class="check-qty">500 г</span></div>
+            <div class="check-row" data-check><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6.5-11 11-5-5"/></svg></span><span class="check-name">Масло оливковое</span><span class="check-qty">1 бут.</span></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="add-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>Добавить своё</div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="tab-bar">
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tb">5</span><span class="tl">План</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">21 · Покупки</div><div class="pc-t">По отделам магазина</div><div class="pc-d">Отметил → купил → холодильник сам пополнится</div></div>
+    </div>
+
+    <!-- ══ 22 Итог закупки ══ -->
+    <div class="phone" id="s-after">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div><div class="t">Купили!</div><div class="s">Добавим в холодильник с типичными сроками</div></div>
+            <button class="icon-btn" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg></button>
+          </div>
+          <div class="pgroup">
+            <div class="as-row"><span class="an">Молоко 2,5%</span><span class="ac">Молочное</span><span class="as-d">≈ <b>5 дней</b></span></div>
+            <div class="as-row"><span class="an">Творог 5%</span><span class="ac">Молочное</span><span class="as-d">≈ <b>4 дня</b></span></div>
+            <div class="as-row"><span class="an">Сливки 20%</span><span class="ac">Молочное</span><span class="as-d">≈ <b>5 дней</b></span></div>
+            <div class="as-row"><span class="an">Бананы</span><span class="ac">Фрукты</span><span class="as-d">≈ <b>3 дня</b></span></div>
+            <div class="as-row"><span class="an">Паста пенне</span><span class="ac">Бакалея</span><span class="as-d">≈ <b>1 год</b></span></div>
+            <div class="as-row"><span class="an">Масло оливковое</span><span class="ac">Бакалея</span><span class="as-d">≈ <b>8 мес.</b></span></div>
+          </div>
+          <div class="hint" style="margin:16px 16px 0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9l4.4 1.6L13.6 12 12 16.5 10.4 12 6 10.6 10.4 9 12 4.5Z"/></svg>Срок подставлен типичный для категории. Знаете точнее — тапните и поправьте.</div>
+          <div class="cta-stack" style="margin:16px 16px 0">
+            <button class="btn btn-primary">Добавить всё в холодильник</button>
+            <button class="btn btn-ghost">Позже</button>
+          </div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">22 · После магазина</div><div class="pc-t">Из «купили» — в «есть дома»</div><div class="pc-d">Мост, который обычно ломает такие приложения</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ ПРОФИЛЬ И СИСТЕМА ═══════════════ -->
+<section class="gallery">
+  <div class="wrap">
+    <div class="flow-head">
+      <div><h2>Профиль и система</h2><p>Честная статистика, контроль уведомлений и спокойная лента событий.</p></div>
+      <span class="flow-tag">Экраны 23–25</span>
+    </div>
+  </div>
+  <div class="phones">
+
+    <!-- ══ 23 Профиль ══ -->
+    <div class="phone" id="s-profile">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stwrap stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="prof-head">
+            <span class="avatar">А</span>
+            <div class="prof-name">Анна Ковалёва</div>
+            <div class="prof-mail">anna@example.com</div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><div class="n">34</div><div class="l">приготовлено</div></div>
+            <div class="stat"><div class="n good">21</div><div class="l">спасено</div></div>
+            <div class="stat"><div class="n bad">3</div><div class="l">выброшено</div></div>
+            <div class="stat"><div class="n">6</div><div class="l">дней серии</div></div>
+          </div>
+          <div class="stat-hero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/></svg>В этом месяце выброшено на 87% меньше, чем до PantryChef.</div>
+          <div class="set-list">
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4.2 1.7 5.5 1.7 5.5H4.8s1.7-1.3 1.7-5.5Z"/><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0"/></svg></span>Уведомления<span class="sv">2 вкл<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 21v-6M5 11V3M12 21v-9M12 8V3M19 21v-4M19 13V3M2.5 15h5M9.5 8h5M16.5 17h5"/></svg></span>Настройки<span class="sv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.9.7c0 1.6-2.4 2-2.4 3.3M12 16.5h.01"/></svg></span>Помощь<span class="sv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="set-row danger"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.5"/><path d="m16 16 4-4-4-4M20 12H9.5"/></svg></span>Выйти</div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="tab-bar">
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-4v6H5.5A1.5 1.5 0 0 1 4 20Z"/></svg></span><span class="tl">Главная</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><path d="M5.5 9.5h13M9 5.5v1.6M9 13v2.4"/></svg></span><span class="tl">Холодильник</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><span class="tl">Рецепты</span></button>
+          <button class="tab"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><span class="tl">План</span></button>
+          <button class="tab active"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5"/></svg></span><span class="tl">Профиль</span></button>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">23 · Профиль</div><div class="pc-t">Зеркало кухни</div><div class="pc-d">И спасённое, и выброшенное — показываем честно</div></div>
+    </div>
+
+    <!-- ══ 24 Настройки ══ -->
+    <div class="phone" id="s-settings">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div style="display:flex;align-items:center;gap:12px"><button class="icon-btn" style="width:36px;height:36px" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M11.5 5.5 5 12l6.5 6.5"/></svg></button><div class="t" style="font-size:20px">Настройки</div></div>
+          </div>
+          <div class="section-label">Кухня</div>
+          <div class="set-list">
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-2.6 2.8-4 5.5-4s4.9 1.4 5.5 4"/><circle cx="17" cy="9" r="2.4"/><path d="M16 15.2c2.2.2 3.9 1.4 4.5 3.8"/></svg></span>Едоков дома<span class="sv num">4<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span>Обед в плане<span class="toggle on" data-toggle></span></div>
+            <div class="set-row" style="color:var(--muted)"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/></svg></span>Диеты и аллергии<span class="sv">скоро</span></div>
+          </div>
+          <div class="section-label">Уведомления</div>
+          <div class="set-list">
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>«Спасаем» по утрам<span class="toggle on" data-toggle></span></div>
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span>План на неделю<span class="toggle on" data-toggle></span></div>
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>Напоминать в<span class="sv num">09:00<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9.5 6 6 6-6 6"/></svg></span></div>
+          </div>
+          <div class="section-label">Аккаунт</div>
+          <div class="set-list">
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span>Двухфакторная защита<span class="toggle on" data-toggle></span></div>
+            <div class="set-row danger"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.5"/><path d="m16 16 4-4-4-4M20 12H9.5"/></svg></span>Выйти из аккаунта</div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">24 · Настройки</div><div class="pc-t">Кухня под вас</div><div class="pc-d">Пуши — по типам, а не «всё или ничего»</div></div>
+    </div>
+
+    <!-- ══ 25 Уведомления ══ -->
+    <div class="phone" id="s-notif">
+      <div class="phone-frame"><div class="notch"></div><div class="phone-screen">
+        <div class="screen-body"><div class="screen-scroll">
+          <div class="stbar"><span class="num">9:41</span><span class="sb-i">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none"><rect x="1" y="2" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.4" opacity=".5"/><rect x="3" y="4" width="14" height="6" rx="1.5" fill="currentColor"/><rect x="22.5" y="5" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </span></div>
+          <div class="app-head">
+            <div><div class="t">Уведомления</div><div class="s">Только по делу</div></div>
+            <button class="rs-link" style="color:var(--accent)">Прочитать все</button>
+          </div>
+          <div class="section-label" style="margin-top:8px">Сегодня</div>
+          <div class="pgroup" style="padding:4px 0">
+            <div class="set-row"><span class="si" style="background:color-mix(in oklab,var(--late),var(--surface) 84%);color:color-mix(in oklab,var(--late),var(--fg) 20%)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span><div style="flex:1"><div style="font-weight:800;font-size:13.5px">Сметане остался день</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Используем её в деле? Есть три идеи.</div><div class="num" style="font-size:10.5px;color:var(--muted);margin-top:4px">09:02</div></div><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex:0 0 auto"></span></div>
+            <div class="set-row"><span class="si" style="background:color-mix(in oklab,var(--soon),var(--surface) 80%);color:color-mix(in oklab,var(--soon),var(--fg) 25%)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg></span><div style="flex:1"><div style="font-weight:800;font-size:13.5px">План на неделю пуст</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Суббота — день закупки. Заполним неделю?</div><div class="num" style="font-size:10.5px;color:var(--muted);margin-top:4px">08:00</div></div><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex:0 0 auto"></span></div>
+          </div>
+          <div class="section-label">Вчера</div>
+          <div class="pgroup" style="padding:4px 0">
+            <div class="set-row"><span class="si" style="background:color-mix(in oklab,var(--fresh),var(--surface) 84%);color:color-mix(in oklab,var(--fresh),var(--fg) 25%)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11.5 8.6 5M19 11.5 15.4 5"/><path d="M3.5 11.5h17l-1.5 6.6a2 2 0 0 1-2 1.6H7a2 2 0 0 1-2-1.6Z"/></svg></span><div style="flex:1"><div style="font-weight:800;font-size:13.5px">Список покупок: 7 позиций</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Собрали из плана на неделю</div><div class="num" style="font-size:10.5px;color:var(--muted);margin-top:4px">18:40</div></div></div>
+            <div class="set-row"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.8 4.9 9 4 6.8 4H3v15h4.5c2 0 3.5.7 4.5 2 1-1.3 2.5-2 4.5-2H21V4h-3.8C15 4 13.2 4.9 12 6.5Z"/><path d="M12 6.5V21"/></svg></span><div style="flex:1"><div style="font-weight:800;font-size:13.5px">«Сырники со сметаной» — в избранном</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Найдёте во вкладке «Рецепты»</div><div class="num" style="font-size:10.5px;color:var(--muted);margin-top:4px">14:12</div></div></div>
+          </div>
+          <div style="height:16px"></div>
+        </div></div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="phone-caption"><div class="pc-n">25 · Уведомления</div><div class="pc-t">Лента событий</div><div class="pc-d">Каждое ведёт к действию, ни одного маркетингового</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─────────────── дизайн-система ─────────────── -->
+<section class="dsys">
+  <div class="wrap">
+    <p class="eyebrow">Дизайн-система · «Тёплая кухня»</p>
+    <h2>Токены, сетка, типографика</h2>
+    <p class="ds-lead">Все цвета — OKLch-токены с теми же именами, что в кодовой базе (--bg, --accent, --fresh, --soon, --late). Отступы — строго по 8pt-сетке: 4 · 8 · 12 · 16 · 24 · 32, боковой отступ экрана — 16. Радиусы — 8 / 12 / 16 / 20. При переносе в приложение меняются значения, не система.</p>
+    <div class="grid-note">
+      <span class="grid-chip">отступы: 4 · 8 · 12 · 16 · 24 · 32</span>
+      <span class="grid-chip">экран: padding 16</span>
+      <span class="grid-chip">радиусы: 8 / 12 / 16 / 20</span>
+      <span class="grid-chip">касание: ≥ 44</span>
+    </div>
+
+    <div class="dgrid">
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.968 0.014 86)"></div><div class="sw-body"><div class="sw-name">Крем</div><div class="sw-val">--bg · 0.968 0.014 86</div><div class="sw-role">Фон, воздух</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.988 0.007 90)"></div><div class="sw-body"><div class="sw-name">Поверхность</div><div class="sw-val">--surface · 0.988 0.007 90</div><div class="sw-role">Карточки, шиты</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.30 0.02 50)"></div><div class="sw-body"><div class="sw-name">Эспрессо</div><div class="sw-val">--fg · 0.30 0.02 50</div><div class="sw-role">Текст</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.645 0.135 47)"></div><div class="sw-body"><div class="sw-name">Мандарин</div><div class="sw-val">--accent · 0.645 0.135 47</div><div class="sw-role">Действия, акценты</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.938 0.045 62)"></div><div class="sw-body"><div class="sw-name">Мандарин мягкий</div><div class="sw-val">--accent-soft · 0.938 0.045 62</div><div class="sw-role">Подложки, AI-заметки</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.60 0.12 148)"></div><div class="sw-body"><div class="sw-name">Свежесть</div><div class="sw-val">--fresh · 0.60 0.12 148</div><div class="sw-role">Свежо, успех</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.73 0.13 74)"></div><div class="sw-body"><div class="sw-name">Янтарь</div><div class="sw-val">--soon · 0.73 0.13 74</div><div class="sw-role">Скоро, 2–3 дня</div></div></div>
+      <div class="swatch"><div class="sw-chip" style="background:oklch(0.585 0.15 30)"></div><div class="sw-body"><div class="sw-name">Терракота</div><div class="sw-val">--late · 0.585 0.15 30</div><div class="sw-role">Спасаем / просрочено</div></div></div>
+    </div>
+
+    <div class="typerow">
+      <div class="tr"><div class="ex" style="font-size:24px;font-weight:800;letter-spacing:-.02em">Привет, Анна</div><span class="lab">display · Nunito 24 / 800</span></div>
+      <div class="tr"><div class="ex" style="font-size:15px;font-weight:800">Паста с курицей и черри</div><span class="lab">заголовок · 15 / 800</span></div>
+      <div class="tr"><div class="ex" style="font-size:14px;font-weight:400">Обжарьте курицу до румяной корочки.</div><span class="lab">текст · 14 / 400</span></div>
+      <div class="tr"><div class="ex" style="font-size:12px;color:var(--muted);font-weight:600">6 из 7 ваших · 30 мин</div><span class="lab">метаданные · 12 / muted</span></div>
+      <div class="tr"><div class="ex num" style="font-size:13px;font-weight:600">07:00 · 400 г · 3 из 8</div><span class="lab">данные · JetBrains Mono</span></div>
+    </div>
+
+    <div class="comp-grid">
+      <div class="comp-card"><h4>Кнопки · высота 48</h4>
+        <div class="demo" style="flex-direction:column;align-items:stretch">
+          <button class="btn btn-primary" style="width:auto">Готовить</button>
+          <button class="btn btn-secondary" style="width:auto">Добавить вручную</button>
+          <button class="btn btn-ghost" style="width:auto">Позже</button>
+        </div>
+      </div>
+      <div class="comp-card"><h4>Статусы свежести</h4>
+        <div class="demo">
+          <span class="badge badge-fresh">5 дней</span>
+          <span class="badge badge-soon">2 дня</span>
+          <span class="badge badge-late">сегодня</span>
+          <span class="badge badge-late">3 дня назад</span>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.45">Всегда с текстом — статус не кодируется одним цветом.</p>
+      </div>
+      <div class="comp-card"><h4>Быстрые действия</h4>
+        <div class="qactions" style="padding:0;grid-template-columns:repeat(2,1fr)">
+          <button class="qaction"><span class="qa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg></span><span>Сканер</span></button>
+          <button class="qaction"><span class="qa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></span><span>Добавить</span></button>
+        </div>
+      </div>
+      <div class="comp-card"><h4>Управление</h4>
+        <div class="demo" style="flex-direction:column;align-items:flex-start;gap:16px">
+          <span class="stepper"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5.5 12h13"/></svg></button><span class="stv">2 шт</span><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg></button></span>
+          <span class="toggle on" data-toggle style="margin-left:0"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="pagefoot">
+  <div class="wrap">
+    <span><b>PantryChef</b> · «Тёплая кухня» · прототип v3 · логотип из <span class="num">public/logo</span></span>
+    <span>Документы: <a href="docs/01-concept.md">концепция</a> · <a href="docs/02-feature-map.md">карта функций</a> · <a href="docs/03-ux-spec.md">UX-спека</a></span>
+  </div>
+</footer>
+
+<script>
+const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+
+/* тема */
+$$('[data-theme-btn]').forEach(b=>b.addEventListener('click',()=>{
+  document.documentElement.dataset.theme=b.dataset.themeBtn;
+  $$('[data-theme-btn]').forEach(x=>x.classList.toggle('is-on',x===b));
+}));
+
+/* чипы — активный один в группе */
+$$('.chip-row').forEach(row=>row.addEventListener('click',e=>{
+  const c=e.target.closest('[data-chip]');if(!c)return;
+  $$('[data-chip]',row).forEach(x=>x.classList.toggle('is-active',x===c));
+}));
+
+/* чекбоксы: списание, покупки, результаты скана */
+document.addEventListener('click',e=>{
+  const row=e.target.closest('[data-check]');
+  if(row)row.classList.toggle('is-checked');
+});
+
+/* сегменты, дни, переключатели — визуально */
+$$('[data-seg]').forEach(g=>g.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  $$('button',g).forEach(x=>x.classList.toggle('on',x===b));
+}));
+$$('[data-day]').forEach(g=>g.addEventListener('click',e=>{
+  const d=e.target.closest('.day-pill');if(!d)return;
+  $$('.day-pill',g).forEach(x=>x.classList.toggle('is-today',x===d));
+}));
+$$('[data-toggle]').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
+
+/* готовка: шаги */
+const cookSteps=[
+  {t:'Достаньте продукты: курицу, пасту, черри и сметану. Поставьте воду для пасты.',timer:null},
+  {t:'Нарежьте курицу крупными кусками, черри — половинками.',timer:null},
+  {t:'Обжарьте курицу на оливковом масле 6–7 минут, до румяной корочки.',timer:'07:00'},
+  {t:'Смешайте пасту с курицей и сметаной, прогрейте пару минут — и подавайте.',timer:'02:00'}
+];
+let cookI=2;
+const cookNum=document.getElementById('cookNum'),cookText=document.getElementById('cookText'),
+      cookTimer=document.getElementById('cookTimer'),cookSegs=document.getElementById('cookSegs'),
+      cookPrev=document.getElementById('cookPrev'),cookNext=document.getElementById('cookNext');
+function renderCook(){
+  if(!cookText)return;
+  const s=cookSteps[cookI];
+  cookNum.innerHTML=`<b>${cookI+1}</b> / ${cookSteps.length}`;
+  cookText.textContent=s.t;
+  cookTimer.style.display=s.timer?'':'none';
+  if(s.timer)cookTimer.lastChild.textContent=s.timer;
+  $$('.seg',cookSegs).forEach((el,i)=>el.classList.toggle('on',i<=cookI));
+  cookPrev.dataset.disabled=cookI===0?'true':'false';
+  cookNext.textContent=cookI===cookSteps.length-1?'Завершить':'Готово →';
+}
+if(cookText){
+  renderCook();
+  cookPrev.addEventListener('click',()=>{if(cookI>0){cookI--;renderCook();}});
+  cookNext.addEventListener('click',()=>{if(cookI<cookSteps.length-1){cookI++;renderCook();}});
+}
+</script>
+</body>
+</html>
