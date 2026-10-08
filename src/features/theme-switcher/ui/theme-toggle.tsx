@@ -11,6 +11,7 @@ export function ThemeToggle() {
 			icon={<Moon />}
 			rightElement={
 				<Switch
+					checked={theme === 'dark'}
 					onCheckedChange={() =>
 						setTheme(theme === 'dark' ? 'light' : 'dark')
 					}

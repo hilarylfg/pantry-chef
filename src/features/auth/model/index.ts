@@ -3,6 +3,7 @@ export type {
 	OAuthProvider,
 	TwoFactorCredentials
 } from './auth.types'
+export { OAUTH_PROVIDERS } from './auth.types'
 export { FlowContext, useAuthFlow } from './auth-flow'
 export type { AuthFlowApi } from './auth-flow'
 export { AUTH_ENDPOINTS } from './auth-endpoints'

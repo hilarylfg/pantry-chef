@@ -5,7 +5,7 @@ import { type IUser, userService } from '@/entities/user'
 const PROFILE_QUERY_KEY = ['profile']
 
 export function useProfileInfo(): {
-	user: IUser
+	user: IUser | undefined
 	isLoading: boolean
 } {
 	const { data: user, isLoading } = useQuery({
