@@ -4,9 +4,9 @@ import { AuthFooter, AuthHeader, AuthInner } from '@/widgets/auth'
 
 export function AuthShell({ children }: { children: ReactNode }): ReactElement {
 	return (
-		<div className='flex flex-col w-full h-full'>
+		<div className='flex h-full w-full flex-col'>
 			<AuthHeader />
-			<div className='flex flex-col my-auto'>
+			<div className='my-auto flex flex-col'>
 				<AuthInner />
 				{children}
 				<AuthFooter />

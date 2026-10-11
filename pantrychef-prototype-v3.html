@@ -78,7 +78,7 @@ h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:800}
 .topbar{position:sticky;top:0;z-index:40;background:color-mix(in oklab,var(--bg),transparent 12%);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
 .topbar-in{display:flex;align-items:center;justify-content:space-between;padding-block:16px;gap:16px}
 .brand{display:flex;align-items:center;gap:12px}
-.logo-chip{width:40px;height:40px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 94%)}
+.logo-chip{width:40px;height:40px;border-radius:12px;background:oklch(0.975 0.009 88);border:1px solid color-mix(in oklab,oklch(0.30 0.02 50),transparent 86%);display:grid;place-items:center;box-shadow:0 1px 2px color-mix(in oklab,var(--fg),transparent 94%)}
 .logo-chip img{width:22px}
 .brand-name{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1}
 .brand-name b{color:var(--accent);font-weight:800}
@@ -288,7 +288,7 @@ h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:800}
 
 /* пустое состояние */
 .empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 32px}
-.empty .e-ic{width:112px;height:112px;border-radius:32px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:24px}
+.empty .e-ic{width:112px;height:112px;border-radius:32px;background:oklch(0.938 0.045 62);display:grid;place-items:center;margin-bottom:24px}
 .empty .e-ic img{width:52px}
 .empty .e-ic svg{width:48px;height:48px;color:color-mix(in oklab,var(--accent),var(--fg) 15%)}
 .empty h2{font-size:20px;letter-spacing:-.01em}
@@ -480,7 +480,7 @@ h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:800}
 .welcome{height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
 .w-wash{position:absolute;inset:0;background:radial-gradient(88% 40% at 50% 4%,var(--accent-soft),transparent 70%)}
 .w-top{position:relative;z-index:2;display:flex;justify-content:center;padding:64px 0 0}
-.w-medal{width:152px;height:152px;border-radius:50%;margin:0 auto 32px;position:relative;display:grid;place-items:center;background:var(--surface);border:1px solid var(--border);box-shadow:0 16px 40px -16px color-mix(in oklab,var(--accent),transparent 55%)}
+.w-medal{width:152px;height:152px;border-radius:50%;margin:0 auto 32px;position:relative;display:grid;place-items:center;background:oklch(0.975 0.009 88);border:1px solid color-mix(in oklab,oklch(0.30 0.02 50),transparent 84%);box-shadow:0 16px 40px -16px color-mix(in oklab,var(--accent),transparent 55%)}
 .w-medal::after{content:"";position:absolute;inset:12px;border-radius:50%;border:2px dashed color-mix(in oklab,var(--fg),transparent 78%)}
 .w-medal img{width:64px;position:relative;z-index:2}
 .w-stage{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px;text-align:center}

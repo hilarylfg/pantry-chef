@@ -4,16 +4,16 @@ import { Moon } from 'lucide-react'
 import { SettingsRow, Switch } from '@/shared'
 
 export function ThemeToggle() {
-	const { theme, setTheme } = useTheme()
+	const { resolvedTheme, setTheme } = useTheme()
 
 	return (
 		<SettingsRow
 			icon={<Moon />}
 			rightElement={
 				<Switch
-					checked={theme === 'dark'}
+					checked={resolvedTheme === 'dark'}
 					onCheckedChange={() =>
-						setTheme(theme === 'dark' ? 'light' : 'dark')
+						setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
 					}
 				/>
 			}

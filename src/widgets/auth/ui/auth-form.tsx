@@ -15,7 +15,7 @@ import { Tabs, TabsContent } from '@/shared'
 import { AuthShell } from '@/widgets/auth'
 
 export function AuthForm(): ReactElement {
-	const [mode, setMode] = useState<AuthStep>('login')
+	const [mode, setMode] = useState<AuthStep>('2fa')
 	const [credentials, setCredentials] = useState<TwoFactorCredentials | null>(
 		null
 	)
@@ -46,12 +46,10 @@ export function AuthForm(): ReactElement {
 						<SignupForm />
 					</TabsContent>
 					<TabsContent value='2fa'>
-						{credentials && (
-							<TwoFactorForm
-								email={credentials.email}
-								password={credentials.password}
-							/>
-						)}
+						<TwoFactorForm
+							email={credentials?.email || ''}
+							password={credentials?.password || ''}
+						/>
 					</TabsContent>
 				</Tabs>
 			</AuthShell>

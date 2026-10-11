@@ -1,18 +1,10 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 
 import { IProduct } from '@/entities/product'
-import { type IUser } from '@/entities/user'
-import {
-	AUTH_MESSAGES,
-	AUTH_MUTATION_KEYS,
-	loginService,
-	TypeLoginSchema,
-	useAuthFlow
-} from '@/features/auth'
-import { HOME_PATH, toast, toastMessageHandler } from '@/shared'
+import { AUTH_MUTATION_KEYS } from '@/features/auth'
+import { toastMessageHandler } from '@/shared'
 
 import { productsService } from '../api/products.service'
 

@@ -1,8 +1,13 @@
 import { useProfileInfo } from '@/entities/user'
+import { LogoLoader } from '@/features/loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared'
 
 export function ProfileStats() {
-	const { user } = useProfileInfo()
+	const { user, isLoading } = useProfileInfo()
+
+	if (isLoading || !user) {
+		return <LogoLoader isLoading />
+	}
 
 	return (
 		<div className='flex flex-col items-center gap-3'>
