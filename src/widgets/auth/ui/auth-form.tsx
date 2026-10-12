@@ -19,7 +19,6 @@ export function AuthForm(): ReactElement {
 		null
 	)
 
-	/** Колбэк из LoginForm: бэкенд запросил код из письма. */
 	const startTwoFactor = (email: string, password: string): void => {
 		setCredentials({ email, password })
 		setMode('2fa')

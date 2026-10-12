@@ -21,7 +21,6 @@ import { LoginSchema, type TypeLoginSchema } from '../model/login.schema'
 import { useLogin } from '../model/use-login'
 
 interface LoginFormProps {
-	/** Вызывается, когда бэкенд отвечает челленджем 2FA. */
 	onTwoFactor: (email: string, password: string) => void
 }
 

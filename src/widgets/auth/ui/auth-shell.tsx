@@ -18,7 +18,6 @@ const SUBTITLES: Readonly<Record<Exclude<AuthStep, '2fa'>, string>> = {
 
 interface AuthShellProps {
 	mode: AuthStep
-	/** Подменяет дефолтный подзаголовок шага — нужен для 2FA с email. */
 	subtitle?: string
 	children: ReactNode
 }
@@ -28,7 +27,7 @@ export function AuthShell({
 	subtitle,
 	children
 }: AuthShellProps): ReactElement {
-	const centered = mode === '2fa'
+	const is2Fa = mode === '2fa'
 
 	return (
 		<div className='flex h-full w-full flex-col'>
@@ -37,7 +36,7 @@ export function AuthShell({
 				<h1
 					className={cn(
 						'mb-2 text-3xl font-extrabold',
-						centered && 'text-center'
+						is2Fa && 'text-center'
 					)}
 				>
 					{TITLES[mode]}
@@ -45,7 +44,7 @@ export function AuthShell({
 				<p
 					className={cn(
 						'mb-4 text-sm',
-						centered && 'text-center text-lg'
+						is2Fa && 'text-center text-lg'
 					)}
 				>
 					{subtitle ?? SUBTITLES[mode as Exclude<AuthStep, '2fa'>]}

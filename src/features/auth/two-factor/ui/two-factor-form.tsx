@@ -37,7 +37,6 @@ export function TwoFactorForm({
 		})
 	}
 
-	/** Повторная отправка — побочный эффект повторного логина на бэкенде. */
 	const onResend = (): void => {
 		login(
 			{ email, password },
