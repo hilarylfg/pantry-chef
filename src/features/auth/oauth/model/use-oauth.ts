@@ -1,13 +1,16 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { type UseMutateAsyncFunction, useMutation } from '@tanstack/react-query'
 
 import { api } from '@/shared'
 
 import { AUTH_ENDPOINTS } from '../../model/auth-endpoints'
 import type { OAuthProvider } from '../../model/auth.types'
 
-export function useOauth() {
+export function useOauth(): {
+	oauth: UseMutateAsyncFunction<{ url: string }, Error, OAuthProvider>
+	isPending: boolean
+} {
 	const { mutateAsync: oauth, isPending } = useMutation<
 		{ url: string },
 		Error,

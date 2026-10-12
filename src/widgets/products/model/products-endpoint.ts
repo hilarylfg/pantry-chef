@@ -34,11 +34,11 @@ export const PRODUCTS_ENDPOINTS: Readonly<{
 			limit: String(limit)
 		})
 
-		return `/products?${query.toString()}`
+		return `products?${query.toString()}`
 	},
-	byId: (id: string) => `/products/${id}`,
+	byId: (id: string) => `products/${id}`,
 	expiring: (days: number = EXPIRING_SOON_DAYS) =>
-		`/products/expiring?days=${days}`,
-	consume: (id: string) => `/products/${id}/consume`,
-	barcode: (barcode: string) => `/products/barcode/${barcode}`
+		`products/expiring?days=${days}`,
+	consume: (id: string) => `products/${id}/consume`,
+	barcode: (barcode: string) => `products/barcode/${barcode}`
 }

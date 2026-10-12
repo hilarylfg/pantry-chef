@@ -1,6 +1,7 @@
 'use client'
 
 import { Plus } from 'lucide-react'
+import { useEffect } from 'react'
 
 import { useProfileInfo } from '@/entities/user'
 import { LogoLoader } from '@/features/loader'
@@ -13,10 +14,16 @@ import {
 	TabsContent
 } from '@/shared'
 import { BottomNav } from '@/widgets/bottom-nav'
+import { useProducts } from '@/widgets/products'
 import { Profile } from '@/widgets/profile'
 
 export default function Page() {
 	const { user, isLoading } = useProfileInfo()
+	const { products } = useProducts()
+
+	useEffect(() => {
+		console.log(products)
+	}, [products])
 
 	return (
 		<Tabs className='flex min-h-svh'>
@@ -42,6 +49,14 @@ export default function Page() {
 								<span className='text-xs'>
 									Что приготовим сегодня?
 								</span>
+							</div>
+						</div>
+					)}
+					{products && (
+						<div className='flex w-full rounded-lg bg-secondary p-4'>
+							<div></div>
+							<div>
+								<p>продукта просят внимания</p>
 							</div>
 						</div>
 					)}
