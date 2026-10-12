@@ -1,37 +1,39 @@
 import { type ReactElement } from 'react'
 
-import { type AuthStep, OAuthButtons, useAuthFlow } from '@/features/auth'
+import { type AuthStep, OAuthButtons } from '@/features/auth'
 
-export function AuthFooter(): ReactElement {
-	const { switchTo, mode } = useAuthFlow()
+interface AuthFooterProps {
+	mode: AuthStep
+	onSwitch: (mode: AuthStep) => void
+}
+
+export function AuthFooter({
+	mode,
+	onSwitch
+}: AuthFooterProps): ReactElement | null {
+	if (mode === '2fa') {
+		return null
+	}
 
 	const nextMode: AuthStep = mode === 'login' ? 'signup' : 'login'
 
 	return (
 		<>
-			{mode !== '2fa' && (
-				<>
-					<div className='flex items-center gap-3 my-2 after:content-[" "] after:flex-1 after:h-px after:bg-muted-foreground before:content-[" "] before:flex-1 before:h-px before:bg-muted-foreground'>
-						<p className='text-xs text-muted-foreground'>
-							или продолжить через
-						</p>
-					</div>
-					<OAuthButtons />
-					<span className='flex justify-center gap-1 text-sm'>
-						{nextMode === 'login'
-							? 'Уже с нами?'
-							: 'Ещё нет аккаунта?'}
-						<button
-							className='text-primary cursor-pointer'
-							onClick={() => switchTo(nextMode)}
-						>
-							{nextMode === 'login'
-								? 'Войти'
-								: 'Зарегистрироваться'}
-						</button>
-					</span>
-				</>
-			)}
+			<div className='after:content-[" "] before:content-[" "] my-2 flex items-center gap-3 before:h-px before:flex-1 before:bg-muted-foreground after:h-px after:flex-1 after:bg-muted-foreground'>
+				<p className='text-xs text-muted-foreground'>
+					или продолжить через
+				</p>
+			</div>
+			<OAuthButtons />
+			<span className='flex justify-center gap-1 text-sm'>
+				{nextMode === 'login' ? 'Уже с нами?' : 'Ещё нет аккаунта?'}
+				<button
+					className='cursor-pointer text-primary'
+					onClick={() => onSwitch(nextMode)}
+				>
+					{nextMode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+				</button>
+			</span>
 		</>
 	)
 }

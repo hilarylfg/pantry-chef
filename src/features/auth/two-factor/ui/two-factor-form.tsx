@@ -1,28 +1,59 @@
 'use client'
 
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
+import { useRouter } from 'next/navigation'
 import { type ReactElement, useState } from 'react'
 
 import {
-	type TwoFactorCredentials,
-	useLoginMutation,
-	useTwoFactorMutation
-} from '@/features/auth'
-import {
 	Field,
+	HOME_PATH,
 	InputOTP,
 	InputOTPGroup,
 	InputOTPSlot,
-	OTP_LENGTH
+	OTP_LENGTH,
+	toast
 } from '@/shared'
+
+import { useLogin } from '../../login/model/use-login'
+import { AUTH_MESSAGES } from '../../model/auth-messages'
+import type { TwoFactorCredentials } from '../../model/auth.types'
+import { useTwoFactor } from '../model/use-two-factor'
 
 export function TwoFactorForm({
 	email,
 	password
 }: TwoFactorCredentials): ReactElement {
 	const [code, setCode] = useState('')
-	const { verify } = useTwoFactorMutation(email, password)
-	const { login } = useLoginMutation()
+	const router = useRouter()
+	const { verify } = useTwoFactor(email, password)
+	const { login } = useLogin()
+
+	const onVerifyComplete = (value: string): void => {
+		verify(value, {
+			onSuccess: () => {
+				toast.add({ type: 'success', title: AUTH_MESSAGES.welcome })
+				router.push(HOME_PATH)
+			}
+		})
+	}
+
+	/** Повторная отправка — побочный эффект повторного логина на бэкенде. */
+	const onResend = (): void => {
+		login(
+			{ email, password },
+			{
+				onSuccess: data => {
+					if (!('message' in data)) {
+						toast.add({
+							type: 'success',
+							title: AUTH_MESSAGES.welcome
+						})
+						router.push(HOME_PATH)
+					}
+				}
+			}
+		)
+	}
 
 	return (
 		<div className='flex flex-col gap-5'>
@@ -34,8 +65,8 @@ export function TwoFactorForm({
 					maxLength={OTP_LENGTH}
 					value={code}
 					pattern={REGEXP_ONLY_DIGITS}
-					onComplete={() => verify(code)}
-					onChange={value => setCode(value)}
+					onComplete={onVerifyComplete}
+					onChange={setCode}
 				>
 					<InputOTPGroup>
 						{Array.from({ length: OTP_LENGTH }, (_, index) => (
@@ -47,8 +78,8 @@ export function TwoFactorForm({
 			<span className='flex justify-center gap-1 text-sm'>
 				Не пришёл код?
 				<button
-					className='text-primary cursor-pointer'
-					onClick={() => login({ email, password })}
+					className='cursor-pointer text-primary'
+					onClick={onResend}
 				>
 					Отправить ещё раз
 				</button>

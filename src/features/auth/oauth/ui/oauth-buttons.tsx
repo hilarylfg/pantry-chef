@@ -4,8 +4,10 @@ import { useRouter } from 'next/navigation'
 import { type ReactElement } from 'react'
 import { FaGithub, FaGoogle, FaYandex } from 'react-icons/fa'
 
-import { type OAuthProvider, useOauthMutation } from '@/features/auth'
 import { Button } from '@/shared'
+
+import type { OAuthProvider } from '../../model/auth.types'
+import { useOauth } from '../model/use-oauth'
 
 const OAUTH_PROVIDERS: ReadonlyArray<{
 	provider: OAuthProvider
@@ -24,28 +26,24 @@ const PROVIDER_BUTTON_LABELS: Readonly<Record<OAuthProvider, string>> = {
 
 export function OAuthButtons(): ReactElement {
 	const router = useRouter()
-	const { oauth, isLoading } = useOauthMutation()
+	const { oauth, isPending } = useOauth()
 
-	const onClick = async (provider: OAuthProvider): Promise<void> => {
-		try {
-			const response = await oauth(provider)
-
-			if (response) {
+	const onClick = (provider: OAuthProvider): void => {
+		oauth(provider, {
+			onSuccess: response => {
 				router.push(response.url)
 			}
-		} catch {
-			// Error toast is surfaced by the mutation's onError handler.
-		}
+		})
 	}
 
 	return (
-		<div className='grid grid-cols-3 gap-4 my-6'>
+		<div className='my-6 grid grid-cols-3 gap-4'>
 			{OAUTH_PROVIDERS.map(({ provider, icon }) => (
 				<Button
 					key={provider}
 					variant='outline'
-					className='w-full h-10'
-					disabled={isLoading}
+					className='h-10 w-full'
+					disabled={isPending}
 					onClick={() => onClick(provider)}
 				>
 					{icon}

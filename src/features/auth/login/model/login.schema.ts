@@ -4,8 +4,7 @@ import { emailField, passwordField } from '@/shared'
 
 export const LoginSchema = z.object({
 	email: emailField,
-	password: passwordField,
-	code: z.optional(z.string())
+	password: passwordField
 })
 
 export type TypeLoginSchema = z.infer<typeof LoginSchema>

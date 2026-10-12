@@ -6,18 +6,18 @@ import { type ReactElement } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
-	SignupSchema,
-	TypeSignupSchema,
-	useSignupMutation
-} from '@/features/auth'
-import {
 	Button,
 	Checkbox,
 	Field,
 	FieldError,
 	FieldLabel,
-	TextField
+	TextField,
+	toast
 } from '@/shared'
+
+import { AUTH_MESSAGES } from '../../model/auth-messages'
+import { SignupSchema, type TypeSignupSchema } from '../model/signup.schema'
+import { useSignup } from '../model/use-signup'
 
 export function SignupForm(): ReactElement {
 	const form = useForm<TypeSignupSchema>({
@@ -25,10 +25,14 @@ export function SignupForm(): ReactElement {
 		defaultValues: { name: '', email: '', password: '' }
 	})
 
-	const { signup, isLoadingSignup } = useSignupMutation()
+	const { signup, isPending } = useSignup()
 
 	const onSubmit = (values: TypeSignupSchema): void => {
-		signup(values)
+		signup(values, {
+			onSuccess: () => {
+				toast.add({ type: 'success', title: AUTH_MESSAGES.welcome })
+			}
+		})
 	}
 
 	return (
@@ -49,7 +53,7 @@ export function SignupForm(): ReactElement {
 				label='Почта'
 				type='email'
 				placeholder='m@example.com'
-				disabled={isLoadingSignup}
+				disabled={isPending}
 				required
 			/>
 			<TextField
@@ -57,7 +61,7 @@ export function SignupForm(): ReactElement {
 				control={form.control}
 				label='Пароль'
 				type='password'
-				disabled={isLoadingSignup}
+				disabled={isPending}
 				required
 			/>
 			<Controller
@@ -94,9 +98,9 @@ export function SignupForm(): ReactElement {
 			<Button
 				type='submit'
 				className='mb-5 h-10 w-full'
-				disabled={isLoadingSignup}
+				disabled={isPending}
 			>
-				{isLoadingSignup ? 'Создаём…' : 'Создать аккаунт'}
+				{isPending ? 'Создаём…' : 'Создать аккаунт'}
 			</Button>
 		</form>
 	)

@@ -22,25 +22,28 @@ export class FetchClient {
 	}
 
 	private createSearchParams(params: TypeSearchParams): string {
+		const merged = { ...this.params, ...params }
 		const searchParams = new URLSearchParams()
 
-		for (const key in { ...this.params, ...params }) {
-			if (Object.prototype.hasOwnProperty.call(params, key)) {
-				const value = params[key]
+		for (const [key, value] of Object.entries(merged)) {
+			if (value === undefined) {
+				continue
+			}
 
-				if (Array.isArray(value)) {
-					value.forEach(currentValue => {
-						if (currentValue) {
-							searchParams.append(key, currentValue.toString())
-						}
-					})
-				} else if (value) {
-					searchParams.set(key, value.toString())
-				}
+			if (Array.isArray(value)) {
+				value.forEach(currentValue => {
+					if (currentValue !== undefined) {
+						searchParams.append(key, currentValue.toString())
+					}
+				})
+			} else {
+				searchParams.set(key, value.toString())
 			}
 		}
 
-		return `?${searchParams.toString()}`
+		const query = searchParams.toString()
+
+		return query ? `?${query}` : ''
 	}
 
 	private async parseErrorResponse(response: Response): Promise<string> {
@@ -75,17 +78,17 @@ export class FetchClient {
 	): Promise<T> {
 		let url = `${this.baseUrl}/${endpoint}`
 
-		if (options.params) {
-			url += this.createSearchParams(options.params)
+		if (options.params || this.params) {
+			url += this.createSearchParams(options.params ?? {})
 		}
 
 		const config: RequestInit = {
+			...this.options,
 			...options,
-			...(!!this.options && { ...this.options }),
 			method,
 			headers: {
-				...(!!options?.headers && options.headers),
-				...this.headers
+				...this.headers,
+				...options.headers
 			}
 		}
 

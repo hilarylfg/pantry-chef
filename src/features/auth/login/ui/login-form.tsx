@@ -2,31 +2,53 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { type ReactElement, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
-import { LoginSchema, TypeLoginSchema, useLoginMutation } from '@/features/auth'
 import {
 	Button,
 	Checkbox,
 	Field,
-	FieldError,
 	FieldLabel,
-	Input,
-	TextField
+	HOME_PATH,
+	TextField,
+	toast
 } from '@/shared'
 
-export function LoginForm() {
+import { AUTH_MESSAGES } from '../../model/auth-messages'
+import { LoginSchema, type TypeLoginSchema } from '../model/login.schema'
+import { useLogin } from '../model/use-login'
+
+interface LoginFormProps {
+	/** Вызывается, когда бэкенд отвечает челленджем 2FA. */
+	onTwoFactor: (email: string, password: string) => void
+}
+
+export function LoginForm({ onTwoFactor }: LoginFormProps): ReactElement {
 	const [showPassword, setShowPassword] = useState(false)
+	const router = useRouter()
 	const form = useForm<TypeLoginSchema>({
 		resolver: zodResolver(LoginSchema),
 		defaultValues: { email: '', password: '' }
 	})
 
-	const { login, isLoadingLogin } = useLoginMutation()
+	const { login, isPending } = useLogin()
 
 	const onSubmit = (values: TypeLoginSchema): void => {
-		login(values)
+		login(values, {
+			onSuccess: data => {
+				if ('message' in data) {
+					onTwoFactor(values.email, values.password)
+				} else {
+					toast.add({
+						type: 'success',
+						title: AUTH_MESSAGES.loginSuccess
+					})
+					router.push(HOME_PATH)
+				}
+			}
+		})
 	}
 
 	return (
@@ -40,57 +62,41 @@ export function LoginForm() {
 				label='Почта'
 				type='email'
 				placeholder='m@example.com'
-				disabled={isLoadingLogin}
+				disabled={isPending}
 				required
 			/>
-
-			<Controller
+			<TextField
 				name='password'
 				control={form.control}
-				render={({ field, fieldState }) => (
-					<Field data-invalid={fieldState.invalid}>
-						<FieldLabel htmlFor='password'>Пароль</FieldLabel>
-						<div className='relative'>
-							<Input
-								id='password'
-								className='text-[15px]'
-								aria-invalid={fieldState.invalid}
-								type={showPassword ? 'text' : 'password'}
-								placeholder='••••••••'
-								autoComplete='current-password'
-								disabled={isLoadingLogin}
-								required
-								{...field}
-							/>
-							<button
-								type='button'
-								onClick={() => setShowPassword(show => !show)}
-								className='absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground'
-								aria-label={
-									showPassword
-										? 'Скрыть пароль'
-										: 'Показать пароль'
-								}
-							>
-								{showPassword ? (
-									<EyeOffIcon size={18} />
-								) : (
-									<EyeIcon size={18} />
-								)}
-							</button>
-						</div>
-						{fieldState.invalid && (
-							<FieldError errors={[fieldState.error]} />
+				label='Пароль'
+				type={showPassword ? 'text' : 'password'}
+				placeholder='••••••••'
+				autoComplete='current-password'
+				disabled={isPending}
+				required
+				trailing={
+					<button
+						type='button'
+						onClick={() => setShowPassword(show => !show)}
+						className='text-muted-foreground'
+						aria-label={
+							showPassword ? 'Скрыть пароль' : 'Показать пароль'
+						}
+					>
+						{showPassword ? (
+							<EyeOffIcon size={18} />
+						) : (
+							<EyeIcon size={18} />
 						)}
-					</Field>
-				)}
+					</button>
+				}
 			/>
 			<div className='flex items-center'>
 				<Field orientation='horizontal' className='w-fit'>
 					<Checkbox
 						id='remember-checkbox'
 						name='remember-checkbox'
-						disabled={isLoadingLogin}
+						disabled={isPending}
 					/>
 					<FieldLabel
 						className='text-[13px]'
@@ -109,9 +115,9 @@ export function LoginForm() {
 			<Button
 				type='submit'
 				className='mb-5 h-10 w-full'
-				disabled={isLoadingLogin}
+				disabled={isPending}
 			>
-				{isLoadingLogin ? 'Входим…' : 'Войти'}
+				{isPending ? 'Входим…' : 'Войти'}
 			</Button>
 		</form>
 	)

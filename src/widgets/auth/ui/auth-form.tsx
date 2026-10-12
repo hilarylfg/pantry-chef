@@ -1,58 +1,45 @@
 'use client'
 
-import { type ReactElement, useCallback, useMemo, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import {
-	type AuthFlowApi,
 	type AuthStep,
-	FlowContext,
 	LoginForm,
 	SignupForm,
 	type TwoFactorCredentials,
 	TwoFactorForm
 } from '@/features/auth'
-import { Tabs, TabsContent } from '@/shared'
-import { AuthShell } from '@/widgets/auth'
+
+import { AuthFooter } from './auth-footer'
+import { AuthShell } from './auth-shell'
 
 export function AuthForm(): ReactElement {
-	const [mode, setMode] = useState<AuthStep>('2fa')
+	const [mode, setMode] = useState<AuthStep>('login')
 	const [credentials, setCredentials] = useState<TwoFactorCredentials | null>(
 		null
 	)
 
-	const switchTo = useCallback((next: AuthStep): void => setMode(next), [])
-
-	const requestTwoFactor = useCallback(
-		(email: string, password: string): void => {
-			setCredentials({ email, password })
-			setMode('2fa')
-		},
-		[]
-	)
-
-	const value = useMemo<AuthFlowApi>(
-		() => ({ mode, switchTo, requestTwoFactor }),
-		[mode, switchTo, requestTwoFactor]
-	)
+	/** Колбэк из LoginForm: бэкенд запросил код из письма. */
+	const startTwoFactor = (email: string, password: string): void => {
+		setCredentials({ email, password })
+		setMode('2fa')
+	}
 
 	return (
-		<FlowContext.Provider value={value}>
-			<AuthShell>
-				<Tabs value={mode}>
-					<TabsContent value='login'>
-						<LoginForm />
-					</TabsContent>
-					<TabsContent value='signup'>
-						<SignupForm />
-					</TabsContent>
-					<TabsContent value='2fa'>
-						<TwoFactorForm
-							email={credentials?.email || ''}
-							password={credentials?.password || ''}
-						/>
-					</TabsContent>
-				</Tabs>
-			</AuthShell>
-		</FlowContext.Provider>
+		<AuthShell
+			mode={mode}
+			subtitle={
+				mode === '2fa'
+					? `Отправили шесть цифр на ${credentials?.email ?? ''}`
+					: undefined
+			}
+		>
+			{mode === 'login' && <LoginForm onTwoFactor={startTwoFactor} />}
+			{mode === 'signup' && <SignupForm />}
+			{mode === '2fa' && credentials !== null && (
+				<TwoFactorForm {...credentials} />
+			)}
+			<AuthFooter mode={mode} onSwitch={setMode} />
+		</AuthShell>
 	)
 }

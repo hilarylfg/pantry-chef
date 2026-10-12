@@ -1,8 +1,9 @@
-import { AccountRow } from '@/features/account'
 import { LogoutRow } from '@/features/auth'
-import { FoodPreferencesRow } from '@/features/food-preferences'
 import { NotificationToggle } from '@/features/push'
 import { ThemeToggle } from '@/features/theme-switcher'
+
+import { AccountRow } from './account-row'
+import { FoodPreferencesRow } from './food-preferences-row'
 
 export function SettingsList() {
 	return (

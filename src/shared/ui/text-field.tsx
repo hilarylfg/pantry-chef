@@ -16,9 +16,12 @@ interface TextFieldProps<T extends FieldValues> {
 	label: string
 	type?: React.InputHTMLAttributes<HTMLInputElement>['type']
 	placeholder?: string
+	autoComplete?: string
 	disabled?: boolean
 	required?: boolean
 	className?: string
+	/** Контент у правого края поля: иконки, кнопки. */
+	trailing?: React.ReactNode
 }
 
 function TextField<T extends FieldValues>({
@@ -27,9 +30,11 @@ function TextField<T extends FieldValues>({
 	label,
 	type = 'text',
 	placeholder,
+	autoComplete,
 	disabled,
 	required,
-	className
+	className,
+	trailing
 }: TextFieldProps<T>): React.ReactElement {
 	return (
 		<Controller
@@ -38,16 +43,28 @@ function TextField<T extends FieldValues>({
 			render={({ field, fieldState }) => (
 				<Field data-invalid={fieldState.invalid}>
 					<FieldLabel htmlFor={name}>{label}</FieldLabel>
-					<Input
-						id={name}
-						type={type}
-						className={cn('text-[15px]', className)}
-						placeholder={placeholder}
-						disabled={disabled}
-						aria-invalid={fieldState.invalid}
-						required={required}
-						{...field}
-					/>
+					<div className='relative'>
+						<Input
+							id={name}
+							type={type}
+							className={cn(
+								'text-[15px]',
+								trailing && 'pr-10',
+								className
+							)}
+							placeholder={placeholder}
+							autoComplete={autoComplete}
+							disabled={disabled}
+							aria-invalid={fieldState.invalid}
+							required={required}
+							{...field}
+						/>
+						{trailing && (
+							<div className='absolute inset-y-0 right-3 flex items-center'>
+								{trailing}
+							</div>
+						)}
+					</div>
 					{fieldState.invalid && (
 						<FieldError errors={[fieldState.error]} />
 					)}

@@ -2,8 +2,6 @@
 
 import webpush from 'web-push'
 
-import { toast } from '@/shared'
-
 type WebPushSubscription = {
 	endpoint: string
 	keys: {

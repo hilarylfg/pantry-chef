@@ -7,7 +7,7 @@ export const SignupSchema = z.object({
 	email: emailField,
 	password: passwordField,
 	acceptTerms: z.literal(true, {
-		errorMap: () => ({ message: 'Нужно принять условия' })
+		error: 'Нужно принять условия'
 	})
 })
 

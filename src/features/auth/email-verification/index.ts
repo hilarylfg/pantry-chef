@@ -1,3 +1,2 @@
-export { useVerificationMutation } from './model/use-verification-mutation'
-export { verificationService } from './api/verification.service'
+export { useVerification } from './model/use-verification'
 export { EmailVerifyPage } from './ui/email-verify-page'
