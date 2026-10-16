@@ -1,6 +1,12 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import {
+	Calendar,
+	ChevronRight,
+	ClockAlert,
+	Plus,
+	ScanLine
+} from 'lucide-react'
 import { useEffect } from 'react'
 
 import { useProfileInfo } from '@/entities/user'
@@ -14,12 +20,13 @@ import {
 	TabsContent
 } from '@/shared'
 import { BottomNav } from '@/widgets/bottom-nav'
-import { useProducts } from '@/widgets/products'
+import { useExpiringProducts, useProducts } from '@/widgets/products'
 import { Profile } from '@/widgets/profile'
 
 export default function Page() {
 	const { user, isLoading } = useProfileInfo()
 	const { products } = useProducts()
+	const { expiringProducts } = useExpiringProducts()
 
 	useEffect(() => {
 		console.log(products)
@@ -52,15 +59,67 @@ export default function Page() {
 							</div>
 						</div>
 					)}
-					{products && (
-						<div className='flex w-full rounded-lg bg-secondary p-4'>
-							<div></div>
-							<div>
-								<p>продукта просят внимания</p>
+					{expiringProducts && products && (
+						<div className='flex w-full gap-3 rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_88%)] p-4'>
+							<div className='my-auto flex size-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_76%)]'>
+								<ClockAlert className='size-5 text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]' />
+							</div>
+							<div className=''>
+								<p className='font-extrabold'>
+									{expiringProducts.length} продукта просят
+									внимания
+								</p>
+								<div className='flex gap-2'>
+									{expiringProducts
+										.slice(0, 1)
+										.map(product => (
+											<p
+												key={product.id}
+												className='w-fit rounded-lg border-border bg-surface px-2 py-1 text-[11px] font-bold text-muted-foreground'
+											>
+												{product.name}
+											</p>
+										))}
+									{expiringProducts.length > 1 && (
+										<p className='w-fit rounded-lg border-border bg-surface px-2 py-1 text-[11px] font-bold text-muted-foreground'>
+											{expiringProducts.length - 1}+
+										</p>
+									)}
+								</div>
+							</div>
+							<div className='ml-auto flex items-center'>
+								<ChevronRight className='size-4 text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]' />
 							</div>
 						</div>
 					)}
-					<div></div>
+					<div className='flex gap-4'>
+						<div className='flex h-22.5 w-full flex-col items-center justify-center gap-1 rounded-lg border border-border bg-surface'>
+							<div className='flex size-10 items-center justify-center rounded-lg bg-accent-soft'>
+								<ScanLine className='size-5 text-primary' />
+							</div>
+							<h2 className='text-[11px] font-extrabold'>
+								Сканер
+							</h2>
+						</div>
+						<div className='flex h-22.5 w-full flex-col items-center justify-center gap-1 rounded-lg border border-border bg-surface'>
+							<div className='flex size-10 items-center justify-center rounded-lg bg-accent-soft'>
+								<Plus className='size-5 text-primary' />
+							</div>
+							<h2 className='text-[11px] font-extrabold'>
+								Добавить
+							</h2>
+						</div>
+						<div className='flex h-22.5 w-full flex-col items-center justify-center gap-1 rounded-lg border border-border bg-surface'>
+							<div className='flex size-10 items-center justify-center rounded-lg bg-accent-soft'>
+								<Calendar className='size-5 text-primary' />
+							</div>
+							<h2 className='text-[11px] font-extrabold'>План</h2>
+						</div>
+					</div>
+					<div className='flex justify-between text-[11px] font-extrabold tracking-wider text-muted-foreground'>
+						<h1 className='uppercase'>Что приготовить сегодня?</h1>
+						<p className='font-mono'>из ваших</p>
+					</div>
 				</TabsContent>
 				<TabsContent
 					value='products'

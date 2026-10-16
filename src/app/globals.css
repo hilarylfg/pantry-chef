@@ -9,6 +9,8 @@
    Структурная дисциплина shadcn (воздух, сетка, фокус-ринги) + тёплая
    мандариново-карамельная палитра поверх кремового / тёплого угля.
    Все цвета — только OKLch-токены. Никакого «чистого» белого/чёрного.
+   Значения цветов синхронизированы с pantrychef-prototype-v3.html
+   (прототип — источник правды по палитре).
    ========================================================================= */
 
 @theme inline {
@@ -21,6 +23,7 @@
     --color-fresh: var(--fresh);
     --color-soon: var(--soon);
     --color-late: var(--late);
+    --color-accent-soft: var(--accent-soft);
     --color-cream: var(--cream);
     --color-coal: var(--coal);
     --color-coal-deep: var(--coal-deep);
@@ -60,14 +63,20 @@
     --color-foreground: var(--foreground);
     --color-background: var(--background);
 
-    /* радиусы — шкала shadcn от базового --radius (=14px, тёплый md из системы) */
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
+    /* радиусы — шкала прототипа v3 (8/12/16/20), база = 16px (--r-lg в v3) */
+    --radius-sm: calc(var(--radius) * 0.5);
+    --radius-md: calc(var(--radius) * 0.75);
     --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+    --radius-xl: calc(var(--radius) * 1.25);
+    --radius-2xl: calc(var(--radius) * 1.5);
+    --radius-3xl: calc(var(--radius) * 1.875);
+    --radius-4xl: calc(var(--radius) * 2.25);
+
+    /* тёплые тени системы — значения лежат в :root/[data-theme="dark"] ниже,
+       утилиты shadow-* забирают их через var() (тема подменяет на угольные) */
+    --shadow-sm: var(--shadow-sm);
+    --shadow-md: var(--shadow-md);
+    --shadow-lg: var(--shadow-lg);
 
     --animate-logo: logo-shimmer 2s linear infinite;
 }
@@ -76,66 +85,69 @@
 [data-theme='light'] {
     /* ── светлая: молоко, ваниль, крем ──────────────────────────────────── */
 
-    /* базовые поверхности shadcn ← тёплая система прототипа */
-    --background: oklch(0.965 0.012 86);            /* страница — тёплый кремовый */
-    --foreground: oklch(0.29 0.015 55);             /* текст — тёплый эспрессо */
-    --surface: oklch(0.987 0.006 90);               /* карточки, приподнятые слои */
+    /* базовые поверхности shadcn ← тёплая система прототипа v3 */
+    --background: oklch(0.968 0.014 86);            /* страница — крем (v3 --bg) */
+    --foreground: oklch(0.30 0.02 50);              /* текст — тёплый эспрессо (v3 --fg) */
+    --surface: oklch(0.988 0.007 90);               /* карточки, приподнятые слои */
     --card: var(--surface);                         /* shadcn-алиас поверхности */
-    --card-foreground: oklch(0.29 0.015 55);
-    --popover: oklch(0.987 0.006 90);
-    --popover-foreground: oklch(0.29 0.015 55);
+    --card-foreground: oklch(0.30 0.02 50);
+    --popover: oklch(0.988 0.007 90);
+    --popover-foreground: oklch(0.30 0.02 50);
 
-    /* мандарин — основной цвет действия (btn-primary в прототипе) */
-    --primary: oklch(0.68 0.145 50);
-    --primary-foreground: oklch(0.99 0.006 90);
-    --accent-on: oklch(0.99 0.006 90);              /* текст на акценте (алиас прототипа) */
+    /* мандарин — основной цвет действия (v3 --accent, btn-primary в прототипе) */
+    --primary: oklch(0.645 0.135 47);
+    --primary-foreground: oklch(0.985 0.008 90);
+    --accent-on: oklch(0.985 0.008 90);             /* текст на акценте (алиас прототипа) */
 
-    /* вторичный / приглушённый фон ← мягкий оттенённый фон (чипы, шапки) */
-    --secondary: oklch(0.948 0.016 80);
-    --secondary-foreground: oklch(0.29 0.015 55);
-    --muted: oklch(0.948 0.016 80);
-    --muted-foreground: oklch(0.57 0.013 68);       /* подписи, метаданные */
-    --accent: oklch(0.948 0.016 80);
-    --accent-foreground: oklch(0.29 0.015 55);
+    /* мягкая мандариновая подложка (v3 --accent-soft): хинты, иконки, активные табы */
+    --accent-soft: oklch(0.938 0.045 62);
+    --accent: var(--accent-soft);                   /* shadcn hover-фон — та же подложка */
+    --accent-foreground: oklch(0.30 0.02 50);
 
-    /* портится — мягкая терракота как деструктивный */
-    --destructive: oklch(0.6 0.16 25);
+    /* вторичный / приглушённый фон (v3 --surface-2: поля, чипы) */
+    --secondary: oklch(0.945 0.018 80);
+    --secondary-foreground: oklch(0.30 0.02 50);
+    --muted: oklch(0.945 0.018 80);
+    --muted-foreground: oklch(0.555 0.02 62);       /* подписи, метаданные (v3 --muted) */
 
-    /* волосок и поля ввода */
-    --border: oklch(0.9 0.014 82);
-    --input: oklch(0.9 0.014 82);
-    --ring: oklch(0.68 0.145 50);                   /* фокус-ринг — мандарин */
+    /* портится — мягкая терракота как деструктивный (v3 --late) */
+    --destructive: oklch(0.585 0.15 30);
 
-    /* доменные токены свежести продуктов */
-    --fresh: oklch(0.6 0.13 145);                    /* свежо — мягкая зелень */
-    --soon: oklch(0.72 0.15 72);                     /* скоро — тёплый янтарь */
-    --late: oklch(0.6 0.16 25);                      /* портится — мягкая терракота */
+    /* волосок и поля ввода (v3 --border) */
+    --border: oklch(0.905 0.018 82);
+    --input: oklch(0.905 0.018 82);
+    --ring: oklch(0.645 0.135 47);                  /* фокус-ринг — мандарин */
+
+    /* доменные токены свежести продуктов (v3 fresh/soon/late) */
+    --fresh: oklch(0.60 0.12 148);                   /* свежо — мягкая зелень */
+    --soon: oklch(0.73 0.13 74);                     /* скоро — тёплый янтарь */
+    --late: oklch(0.585 0.15 30);                    /* портится — терракота */
 
     /* системные алиасы палитры (для кастомных компонентов дизайн-системы) */
-    --cream: oklch(0.985 0.006 90);                  /* тёплый почти-белый */
-    --coal: oklch(0.22 0.02 52);                     /* тёплый почти-чёрный */
-    --coal-deep: oklch(0.13 0.018 48);               /* глубокий уголь — камера/фото */
-    --surface-2: oklch(0.948 0.016 80);              /* мягкий оттенённый фон */
+    --cream: oklch(0.985 0.008 90);                  /* тёплый почти-белый */
+    --coal: oklch(0.22 0.025 55);                    /* тёплый уголь (v3 --deep) — камера, мокап */
+    --coal-deep: oklch(0.13 0.018 48);               /* глубокий уголь — фон оболочки */
+    --surface-2: oklch(0.945 0.018 80);              /* мягкий оттенённый фон */
 
-    /* радиус-база = 14px (md из системы), шкала shadpx считается выше */
-    --radius: 0.875rem;
+    /* радиус-база = 16px (--r-lg из прототипа v3), шкала считается выше */
+    --radius: 1rem;
 
     /* чарт-палитра — тёплые пищевые тона */
-    --chart-1: oklch(0.68 0.145 50);
-    --chart-2: oklch(0.6 0.13 145);
-    --chart-3: oklch(0.72 0.15 72);
-    --chart-4: oklch(0.6 0.16 25);
-    --chart-5: oklch(0.57 0.013 68);
+    --chart-1: oklch(0.645 0.135 47);
+    --chart-2: oklch(0.60 0.12 148);
+    --chart-3: oklch(0.73 0.13 74);
+    --chart-4: oklch(0.585 0.15 30);
+    --chart-5: oklch(0.555 0.02 62);
 
     /* sidebar зеркалит основную палитру */
-    --sidebar: oklch(0.987 0.006 90);
-    --sidebar-foreground: oklch(0.29 0.015 55);
-    --sidebar-primary: oklch(0.68 0.145 50);
-    --sidebar-primary-foreground: oklch(0.99 0.006 90);
-    --sidebar-accent: oklch(0.948 0.016 80);
-    --sidebar-accent-foreground: oklch(0.29 0.015 55);
-    --sidebar-border: oklch(0.9 0.014 82);
-    --sidebar-ring: oklch(0.68 0.145 50);
+    --sidebar: oklch(0.988 0.007 90);
+    --sidebar-foreground: oklch(0.30 0.02 50);
+    --sidebar-primary: oklch(0.645 0.135 47);
+    --sidebar-primary-foreground: oklch(0.985 0.008 90);
+    --sidebar-accent: oklch(0.938 0.045 62);
+    --sidebar-accent-foreground: oklch(0.30 0.02 50);
+    --sidebar-border: oklch(0.905 0.018 82);
+    --sidebar-ring: oklch(0.645 0.135 47);
 
     /* тени / ring / плавность — как в прототипе, на тёплом fg */
     --shadow-sm: 0 1px 2px color-mix(in oklab, var(--foreground), transparent 94%);
@@ -149,54 +161,56 @@
 [data-theme="dark"] {
     /* ── тёмная: тёплый уголь, как прожаренная корочка ───────────────────── */
 
-    --background: oklch(0.255 0.012 56);
-    --foreground: oklch(0.945 0.013 84);
-    --surface: oklch(0.302 0.014 60);
+    --background: oklch(0.25 0.014 55);
+    --foreground: oklch(0.945 0.014 84);
+    --surface: oklch(0.30 0.016 58);
     --card: var(--surface);
-    --card-foreground: oklch(0.945 0.013 84);
-    --popover: oklch(0.302 0.014 60);
-    --popover-foreground: oklch(0.945 0.013 84);
+    --card-foreground: oklch(0.945 0.014 84);
+    --popover: oklch(0.30 0.016 58);
+    --popover-foreground: oklch(0.945 0.014 84);
 
-    --primary: oklch(0.75 0.15 53);
-    --primary-foreground: oklch(0.21 0.025 55);
-    --accent-on: oklch(0.21 0.025 55);              /* текст на акценте (алиас прототипа) */
+    --primary: oklch(0.745 0.14 52);
+    --primary-foreground: oklch(0.23 0.03 52);
+    --accent-on: oklch(0.23 0.03 52);               /* текст на акценте (алиас прототипа) */
 
-    --secondary: oklch(0.348 0.016 58);
-    --secondary-foreground: oklch(0.945 0.013 84);
-    --muted: oklch(0.348 0.016 58);
-    --muted-foreground: oklch(0.72 0.016 74);
-    --accent: oklch(0.348 0.016 58);
-    --accent-foreground: oklch(0.945 0.013 84);
+    --accent-soft: oklch(0.345 0.05 52);
+    --accent: var(--accent-soft);
+    --accent-foreground: oklch(0.945 0.014 84);
 
-    --destructive: oklch(0.69 0.16 27);
+    --secondary: oklch(0.345 0.018 56);
+    --secondary-foreground: oklch(0.945 0.014 84);
+    --muted: oklch(0.345 0.018 56);
+    --muted-foreground: oklch(0.72 0.018 74);
 
-    --border: oklch(0.37 0.014 62);
-    --input: oklch(0.37 0.014 62);
-    --ring: oklch(0.75 0.15 53);
+    --destructive: oklch(0.70 0.15 30);
 
-    --fresh: oklch(0.7 0.14 145);
-    --soon: oklch(0.82 0.14 74);
-    --late: oklch(0.69 0.16 27);
+    --border: oklch(0.37 0.016 58);
+    --input: oklch(0.37 0.016 58);
+    --ring: oklch(0.745 0.14 52);
 
-    --cream: oklch(0.945 0.01 84);
-    --coal: oklch(0.19 0.018 52);
+    --fresh: oklch(0.71 0.13 148);
+    --soon: oklch(0.81 0.13 76);
+    --late: oklch(0.70 0.15 30);
+
+    --cream: oklch(0.945 0.014 84);
+    --coal: oklch(0.165 0.018 52);
     --coal-deep: oklch(0.12 0.016 48);
-    --surface-2: oklch(0.348 0.016 58);
+    --surface-2: oklch(0.345 0.018 56);
 
-    --chart-1: oklch(0.75 0.15 53);
-    --chart-2: oklch(0.7 0.14 145);
-    --chart-3: oklch(0.82 0.14 74);
-    --chart-4: oklch(0.69 0.16 27);
-    --chart-5: oklch(0.72 0.016 74);
+    --chart-1: oklch(0.745 0.14 52);
+    --chart-2: oklch(0.71 0.13 148);
+    --chart-3: oklch(0.81 0.13 76);
+    --chart-4: oklch(0.70 0.15 30);
+    --chart-5: oklch(0.72 0.018 74);
 
-    --sidebar: oklch(0.302 0.014 60);
-    --sidebar-foreground: oklch(0.945 0.013 84);
-    --sidebar-primary: oklch(0.75 0.15 53);
-    --sidebar-primary-foreground: oklch(0.21 0.025 55);
-    --sidebar-accent: oklch(0.348 0.016 58);
-    --sidebar-accent-foreground: oklch(0.945 0.013 84);
-    --sidebar-border: oklch(0.37 0.014 62);
-    --sidebar-ring: oklch(0.75 0.15 53);
+    --sidebar: oklch(0.30 0.016 58);
+    --sidebar-foreground: oklch(0.945 0.014 84);
+    --sidebar-primary: oklch(0.745 0.14 52);
+    --sidebar-primary-foreground: oklch(0.23 0.03 52);
+    --sidebar-accent: oklch(0.345 0.05 52);
+    --sidebar-accent-foreground: oklch(0.945 0.014 84);
+    --sidebar-border: oklch(0.37 0.016 58);
+    --sidebar-ring: oklch(0.745 0.14 52);
 
     --shadow-sm: 0 1px 2px color-mix(in oklab, var(--coal), transparent 70%);
     --shadow-md: 0 6px 18px -8px color-mix(in oklab, var(--coal), transparent 45%),
@@ -220,14 +234,21 @@
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         text-wrap: pretty;
+        transition: background 0.3s var(--ease), color 0.3s var(--ease);
     }
 
     h1, h2, h3, h4 {
+        font-weight: 800;
         text-wrap: balance;
     }
 
+    /* v4-preflight не задаёт курсор кнопкам — в прототипе он pointer */
+    button {
+        cursor: pointer;
+    }
+
     ::selection {
-        background: color-mix(in oklab, var(--primary), transparent 70%);
+        background: color-mix(in oklab, var(--primary), transparent 72%);
     }
 
     :focus-visible {
