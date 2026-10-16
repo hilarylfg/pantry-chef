@@ -12,3 +12,5 @@ export type {
 	MealType,
 	RecipeSortField
 } from './model/recipe.constants'
+export { RECIPES_ENDPOINTS } from './model/recipe.endpoint'
+export { type IRecipe } from './model/recipe.types'

@@ -1,6 +1,7 @@
 'use client'
 
 import {
+	keepPreviousData,
 	type UseMutateFunction,
 	useMutation,
 	useQuery,
@@ -20,7 +21,8 @@ export function useProducts(filters: TypeProductsFilters = {}): {
 } {
 	const { data: products, isLoading } = useQuery({
 		queryKey: [...PRODUCTS_QUERY_KEY, filters],
-		queryFn: () => api.get<IProduct[]>(PRODUCTS_ENDPOINTS.list(filters))
+		queryFn: () => api.get<IProduct[]>(PRODUCTS_ENDPOINTS.list(filters)),
+		placeholderData: keepPreviousData
 	})
 
 	return { products, isLoading }
