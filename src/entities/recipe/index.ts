@@ -14,3 +14,4 @@ export type {
 } from './model/recipe.constants'
 export { RECIPES_ENDPOINTS } from './model/recipe.endpoint'
 export { type IRecipe } from './model/recipe.types'
+export { useGenerateRecipes, useRecipes } from './model/use-recipes'

@@ -1,6 +1,45 @@
+'use client'
+
+import {
+	type UseMutateFunction,
+	useMutation,
+	useQuery,
+	useQueryClient
+} from '@tanstack/react-query'
+
+import { type IRecipe, RECIPES_ENDPOINTS } from '@/entities/recipe'
+import { api } from '@/shared'
+
 const RECIPES_QUERY_KEY = ['recipes'] as const
-const RECIPES_SCALE_TIME = 5 * 60 * 1000
+const RECIPES_STALE_TIME = 5 * 60 * 1000
 
 export function useRecipes(): {
-	recipes: IRecipe
+	recipes: IRecipe[] | undefined
+	isLoading: boolean
+} {
+	const { data: recipes, isLoading } = useQuery({
+		queryKey: [...RECIPES_QUERY_KEY, 'list'],
+		queryFn: () => api.get<IRecipe[]>(RECIPES_ENDPOINTS.list()),
+		staleTime: RECIPES_STALE_TIME
+	})
+
+	return { recipes, isLoading }
+}
+
+export function useGenerateRecipes(): {
+	generate: UseMutateFunction<IRecipe[], Error, void>
+	isPending: boolean
+} {
+	const queryClient = useQueryClient()
+
+	const { mutate: generate, isPending } = useMutation<IRecipe[], Error, void>(
+		{
+			mutationKey: ['recipes', 'generate'],
+			mutationFn: () => api.post<IRecipe[]>(RECIPES_ENDPOINTS.generate()),
+			onSuccess: () =>
+				queryClient.invalidateQueries({ queryKey: RECIPES_QUERY_KEY })
+		}
+	)
+
+	return { generate, isPending }
 }

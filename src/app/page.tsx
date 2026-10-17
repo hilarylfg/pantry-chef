@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 
+import { useRecipes } from '@/entities/recipe'
 import { useProfileInfo } from '@/entities/user'
 import { LogoLoader } from '@/features/loader'
 import {
@@ -27,10 +28,7 @@ export default function Page() {
 	const { user, isLoading } = useProfileInfo()
 	const { products } = useProducts()
 	const { expiringProducts } = useExpiringProducts()
-
-	useEffect(() => {
-		console.log(products)
-	}, [products])
+	const { recipes } = useRecipes()
 
 	return (
 		<Tabs className='flex min-h-svh'>
@@ -119,6 +117,23 @@ export default function Page() {
 					<div className='flex justify-between text-[11px] font-extrabold tracking-wider text-muted-foreground'>
 						<h1 className='uppercase'>Что приготовить сегодня?</h1>
 						<p className='font-mono'>из ваших</p>
+					</div>
+					<div className='flex flex-col gap-3'>
+						{recipes &&
+							recipes.map(recipe => (
+								<div
+									key={recipe.id}
+									className='flex items-center gap-3 rounded-lg border border-border bg-surface p-3'
+								>
+									<div className='size-14 rounded-lg bg-amber-700'></div>
+									<div>
+										<h2>{recipe.title}</h2>
+										<div>
+											<span>{recipe.isFavorite}</span>
+										</div>
+									</div>
+								</div>
+							))}
 					</div>
 				</TabsContent>
 				<TabsContent
