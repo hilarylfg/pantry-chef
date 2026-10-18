@@ -12,5 +12,7 @@ export const RECIPES_ENDPOINTS = {
 		return `recipes?${query.toString()}`
 	},
 	byId: (id: string) => `recipes/${id}`,
-	generate: () => 'recipes/generate'
+	generate: () => 'recipes/generate',
+	recommendationsRecipes: (count?: string) =>
+		`recipes/recommendations${count ? `?count=${count}` : ''}`
 } as const

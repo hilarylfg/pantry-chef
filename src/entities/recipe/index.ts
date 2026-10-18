@@ -13,5 +13,14 @@ export type {
 	RecipeSortField
 } from './model/recipe.constants'
 export { RECIPES_ENDPOINTS } from './model/recipe.endpoint'
-export { type IRecipe } from './model/recipe.types'
-export { useGenerateRecipes, useRecipes } from './model/use-recipes'
+export type {
+	IRecipeCard,
+	IRecipeIngredient,
+	IRecipe,
+	IRecipeStep
+} from './model/recipe.types'
+export {
+	useGenerateRecipes,
+	useRecipes,
+	useRecommendationsRecipes
+} from './model/use-recipes'

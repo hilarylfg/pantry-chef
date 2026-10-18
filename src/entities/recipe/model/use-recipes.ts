@@ -7,7 +7,7 @@ import {
 	useQueryClient
 } from '@tanstack/react-query'
 
-import { type IRecipe, RECIPES_ENDPOINTS } from '@/entities/recipe'
+import { type IRecipe, IRecipeCard, RECIPES_ENDPOINTS } from '@/entities/recipe'
 import { api } from '@/shared'
 
 const RECIPES_QUERY_KEY = ['recipes'] as const
@@ -24,6 +24,20 @@ export function useRecipes(): {
 	})
 
 	return { recipes, isLoading }
+}
+
+export function useRecommendationsRecipes(): {
+	recommendationsRecipes: IRecipeCard[] | undefined
+	isLoading: boolean
+} {
+	const { data: recommendationsRecipes, isLoading } = useQuery({
+		queryKey: [...RECIPES_QUERY_KEY, 'recommendations'],
+		queryFn: () =>
+			api.get<IRecipeCard[]>(RECIPES_ENDPOINTS.recommendationsRecipes()),
+		staleTime: RECIPES_STALE_TIME
+	})
+
+	return { recommendationsRecipes, isLoading }
 }
 
 export function useGenerateRecipes(): {

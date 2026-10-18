@@ -5,11 +5,13 @@ import {
 	ChevronRight,
 	ClockAlert,
 	Plus,
+	RotateCw,
 	ScanLine
 } from 'lucide-react'
 import { useEffect } from 'react'
 
-import { useRecipes } from '@/entities/recipe'
+import { IProduct } from '@/entities/product'
+import { useRecommendationsRecipes } from '@/entities/recipe'
 import { useProfileInfo } from '@/entities/user'
 import { LogoLoader } from '@/features/loader'
 import {
@@ -28,7 +30,7 @@ export default function Page() {
 	const { user, isLoading } = useProfileInfo()
 	const { products } = useProducts()
 	const { expiringProducts } = useExpiringProducts()
-	const { recipes } = useRecipes()
+	const { recommendationsRecipes } = useRecommendationsRecipes()
 
 	return (
 		<Tabs className='flex min-h-svh'>
@@ -119,18 +121,47 @@ export default function Page() {
 						<p className='font-mono'>из ваших</p>
 					</div>
 					<div className='flex flex-col gap-3'>
-						{recipes &&
-							recipes.map(recipe => (
+						{recommendationsRecipes &&
+							recommendationsRecipes?.map(recipe => (
 								<div
 									key={recipe.id}
 									className='flex items-center gap-3 rounded-lg border border-border bg-surface p-3'
 								>
-									<div className='size-14 rounded-lg bg-amber-700'></div>
+									<div className='size-14 shrink-0 rounded-lg bg-amber-700'></div>
 									<div>
-										<h2>{recipe.title}</h2>
-										<div>
-											<span>{recipe.isFavorite}</span>
+										<h2 className='leading-5'>
+											{recipe.title}
+										</h2>
+										<div className='flex flex-wrap gap-3 text-xs text-muted-foreground'>
+											<span className='font-mono font-bold'>
+												{recipe.totalTimeMinutes} мин
+											</span>
+											<p>
+												{recipe.match.matched} из{' '}
+												{recipe.match.total} ваших
+											</p>
+											{recipe.saves.map(save => (
+												<div
+													key={save.productId}
+													className='inline-flex items-center rounded-xl bg-[color-mix(in_oklab,var(--late),var(--surface)_84%)] px-3 py-1 text-[11px] font-extrabold text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]'
+												>
+													{save.name}
+												</div>
+											))}
+											{recipe.saves.length > 1 && (
+												<p className='inline-flex w-fit items-center rounded-xl bg-[color-mix(in_oklab,var(--late),var(--surface)_84%)] px-3 py-1 text-[11px] font-extrabold text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]'>
+													{recipe.saves.length - 1}+
+												</p>
+											)}
 										</div>
+									</div>
+									<div className='ml-auto flex text-muted-foreground'>
+										<Button
+											variant='ghost'
+											className='px-1.5'
+										>
+											<RotateCw className='size-4' />
+										</Button>
 									</div>
 								</div>
 							))}
