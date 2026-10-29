@@ -7,7 +7,7 @@ import { pluralizeRu } from '@/shared'
 export function ExpiringBanner(): ReactElement | null {
 	const { expiringProducts } = useExpiringProducts()
 
-	if (!expiringProducts) return null
+	if (!expiringProducts || expiringProducts.length === 0) return null
 
 	return (
 		<div className='flex w-full gap-3 rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_88%)] p-4'>
