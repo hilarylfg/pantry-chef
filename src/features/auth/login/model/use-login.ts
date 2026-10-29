@@ -9,7 +9,6 @@ import { AUTH_ENDPOINTS } from '../../model/auth-endpoints'
 
 import type { TypeLoginSchema } from './login.schema'
 
-/** Бэкенд отвечает либо сессией с пользователем, либо челленджем 2FA. */
 export type LoginResponse = { user: IUser } | { message: string }
 
 export function useLogin(): {

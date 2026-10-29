@@ -8,7 +8,6 @@ import { AUTH_ENDPOINTS } from '../../model/auth-endpoints'
 
 import type { TypeSignupSchema } from './signup.schema'
 
-/** После регистрации бэкенд шлёт письмо и возвращает сообщение, не пользователя. */
 export type RegisterResponse = { message: string }
 
 export function useSignup(): {

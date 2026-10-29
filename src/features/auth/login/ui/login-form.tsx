@@ -20,11 +20,11 @@ import { AUTH_MESSAGES } from '../../model/auth-messages'
 import { LoginSchema, type TypeLoginSchema } from '../model/login.schema'
 import { useLogin } from '../model/use-login'
 
-interface LoginFormProps {
+interface Props {
 	onTwoFactor: (email: string, password: string) => void
 }
 
-export function LoginForm({ onTwoFactor }: LoginFormProps): ReactElement {
+export function LoginForm({ onTwoFactor }: Props): ReactElement {
 	const [showPassword, setShowPassword] = useState(false)
 	const router = useRouter()
 	const form = useForm<TypeLoginSchema>({

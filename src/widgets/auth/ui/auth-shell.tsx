@@ -16,17 +16,13 @@ const SUBTITLES: Readonly<Record<Exclude<AuthStep, '2fa'>, string>> = {
 	signup: 'Это бесплатно — навсегда. Рецепты, план и покупки под рукой.'
 }
 
-interface AuthShellProps {
+interface Props {
 	mode: AuthStep
 	subtitle?: string
 	children: ReactNode
 }
 
-export function AuthShell({
-	mode,
-	subtitle,
-	children
-}: AuthShellProps): ReactElement {
+export function AuthShell({ mode, subtitle, children }: Props): ReactElement {
 	const is2Fa = mode === '2fa'
 
 	return (

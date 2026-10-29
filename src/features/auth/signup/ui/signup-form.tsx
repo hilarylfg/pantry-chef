@@ -19,11 +19,11 @@ import { AUTH_MESSAGES } from '../../model/auth-messages'
 import { SignupSchema, type TypeSignupSchema } from '../model/signup.schema'
 import { useSignup } from '../model/use-signup'
 
-interface SignupFormProps {
+interface Props {
 	onRegistered: () => void
 }
 
-export function SignupForm({ onRegistered }: SignupFormProps): ReactElement {
+export function SignupForm({ onRegistered }: Props): ReactElement {
 	const form = useForm<TypeSignupSchema>({
 		resolver: zodResolver(SignupSchema),
 		defaultValues: { name: '', email: '', password: '' }

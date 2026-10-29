@@ -34,8 +34,6 @@ export function TwoFactorForm({
 				toast.add({ type: 'success', title: AUTH_MESSAGES.welcome })
 				router.push(HOME_PATH)
 			},
-			// Ошибка уже показана глобальным обработчиком — здесь только
-			// сбрасываем поле, чтобы ввести код заново
 			onError: () => setCode('')
 		})
 	}

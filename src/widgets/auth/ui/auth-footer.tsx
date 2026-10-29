@@ -2,15 +2,12 @@ import { type ReactElement } from 'react'
 
 import { type AuthStep, OAuthButtons } from '@/features/auth'
 
-interface AuthFooterProps {
+interface Props {
 	mode: AuthStep
 	onSwitch: (mode: AuthStep) => void
 }
 
-export function AuthFooter({
-	mode,
-	onSwitch
-}: AuthFooterProps): ReactElement | null {
+export function AuthFooter({ mode, onSwitch }: Props): ReactElement | null {
 	if (mode === '2fa') {
 		return null
 	}
