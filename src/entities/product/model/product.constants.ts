@@ -53,7 +53,6 @@ export type ProductSortField = (typeof PRODUCT_SORT_FIELDS)[number]
 export const PRODUCT_AMOUNT_MIN: number = 0.01
 
 export const PRODUCTS_DEFAULTS = {
-	category: PRODUCT_CATEGORIES[0],
 	page: 1,
 	limit: 20,
 	sort: 'expiryDate',

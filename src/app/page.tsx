@@ -8,9 +8,7 @@ import {
 	RotateCw,
 	ScanLine
 } from 'lucide-react'
-import { useEffect } from 'react'
 
-import { IProduct } from '@/entities/product'
 import { useRecommendationsRecipes } from '@/entities/recipe'
 import { useProfileInfo } from '@/entities/user'
 import { LogoLoader } from '@/features/loader'
@@ -140,14 +138,16 @@ export default function Page() {
 												{recipe.match.matched} из{' '}
 												{recipe.match.total} ваших
 											</p>
-											{recipe.saves.map(save => (
-												<div
-													key={save.productId}
-													className='inline-flex items-center rounded-xl bg-[color-mix(in_oklab,var(--late),var(--surface)_84%)] px-3 py-1 text-[11px] font-extrabold text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]'
-												>
-													{save.name}
-												</div>
-											))}
+											{recipe.saves
+												.slice(0, 1)
+												.map(save => (
+													<div
+														key={save.productId}
+														className='inline-flex items-center rounded-xl bg-[color-mix(in_oklab,var(--late),var(--surface)_84%)] px-3 py-1 text-[11px] font-extrabold text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]'
+													>
+														{save.name}
+													</div>
+												))}
 											{recipe.saves.length > 1 && (
 												<p className='inline-flex w-fit items-center rounded-xl bg-[color-mix(in_oklab,var(--late),var(--surface)_84%)] px-3 py-1 text-[11px] font-extrabold text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]'>
 													{recipe.saves.length - 1}+

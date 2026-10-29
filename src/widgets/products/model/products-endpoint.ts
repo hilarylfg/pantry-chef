@@ -20,19 +20,20 @@ export const PRODUCTS_ENDPOINTS: Readonly<{
 	barcode: (barcode: string) => string
 }> = {
 	list: ({
-		category = PRODUCTS_DEFAULTS.category,
+		category,
 		sort = PRODUCTS_DEFAULTS.sort,
 		order = PRODUCTS_DEFAULTS.order,
 		page = PRODUCTS_DEFAULTS.page,
 		limit = PRODUCTS_DEFAULTS.limit
 	}) => {
 		const query = new URLSearchParams({
-			category,
 			sort,
 			order,
 			page: String(page),
 			limit: String(limit)
 		})
+
+		if (category) query.set('category', category)
 
 		return `products?${query.toString()}`
 	},
