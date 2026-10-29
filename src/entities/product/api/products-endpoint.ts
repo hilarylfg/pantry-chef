@@ -1,10 +1,10 @@
+import type { SortOrder } from '@/shared'
+
 import {
-	EXPIRING_SOON_DAYS,
 	type ProductCategory,
 	PRODUCTS_DEFAULTS,
 	type ProductSortField
-} from '@/entities/product'
-import type { SortOrder } from '@/shared'
+} from '../model/product.constants'
 
 export const PRODUCTS_ENDPOINTS: Readonly<{
 	list: (params: {
@@ -15,7 +15,7 @@ export const PRODUCTS_ENDPOINTS: Readonly<{
 		limit?: number
 	}) => string
 	byId: (id: string) => string
-	expiring: (days?: number) => string
+	expiring: (days: number) => string
 	consume: (id: string) => string
 	barcode: (barcode: string) => string
 }> = {
@@ -38,8 +38,7 @@ export const PRODUCTS_ENDPOINTS: Readonly<{
 		return `products?${query.toString()}`
 	},
 	byId: (id: string) => `products/${id}`,
-	expiring: (days: number = EXPIRING_SOON_DAYS) =>
-		`products/expiring?days=${days}`,
+	expiring: (days: number) => `products/expiring?days=${days}`,
 	consume: (id: string) => `products/${id}/consume`,
 	barcode: (barcode: string) => `products/barcode/${barcode}`
 }

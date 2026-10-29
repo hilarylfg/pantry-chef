@@ -14,7 +14,7 @@ import {
 	toast
 } from '@/shared'
 
-import { useLogin } from '../../login/model/use-login'
+import { useLogin } from '../../login'
 import { AUTH_MESSAGES } from '../../model/auth-messages'
 import type { TwoFactorCredentials } from '../../model/auth.types'
 import { useTwoFactor } from '../model/use-two-factor'
@@ -33,7 +33,10 @@ export function TwoFactorForm({
 			onSuccess: () => {
 				toast.add({ type: 'success', title: AUTH_MESSAGES.welcome })
 				router.push(HOME_PATH)
-			}
+			},
+			// Ошибка уже показана глобальным обработчиком — здесь только
+			// сбрасываем поле, чтобы ввести код заново
+			onError: () => setCode('')
 		})
 	}
 
@@ -42,7 +45,12 @@ export function TwoFactorForm({
 			{ email, password },
 			{
 				onSuccess: data => {
-					if (!('message' in data)) {
+					if ('message' in data) {
+						toast.add({
+							type: 'info',
+							title: AUTH_MESSAGES.codeResent
+						})
+					} else {
 						toast.add({
 							type: 'success',
 							title: AUTH_MESSAGES.welcome

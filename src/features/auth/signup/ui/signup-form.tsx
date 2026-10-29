@@ -19,7 +19,11 @@ import { AUTH_MESSAGES } from '../../model/auth-messages'
 import { SignupSchema, type TypeSignupSchema } from '../model/signup.schema'
 import { useSignup } from '../model/use-signup'
 
-export function SignupForm(): ReactElement {
+interface SignupFormProps {
+	onRegistered: () => void
+}
+
+export function SignupForm({ onRegistered }: SignupFormProps): ReactElement {
 	const form = useForm<TypeSignupSchema>({
 		resolver: zodResolver(SignupSchema),
 		defaultValues: { name: '', email: '', password: '' }
@@ -30,7 +34,11 @@ export function SignupForm(): ReactElement {
 	const onSubmit = (values: TypeSignupSchema): void => {
 		signup(values, {
 			onSuccess: () => {
-				toast.add({ type: 'success', title: AUTH_MESSAGES.welcome })
+				toast.add({
+					type: 'success',
+					title: AUTH_MESSAGES.registered
+				})
+				onRegistered()
 			}
 		})
 	}

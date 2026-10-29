@@ -8,12 +8,12 @@ import {
 	useQueryClient
 } from '@tanstack/react-query'
 
-import { type IProduct, type TypeProductsFilters } from '@/entities/product'
 import { api } from '@/shared'
 
-import { PRODUCTS_ENDPOINTS } from './products-endpoint'
+import { type IProduct, type TypeProductsFilters } from '../model/product.types'
 
-const PRODUCTS_QUERY_KEY = ['products'] as const
+import { PRODUCTS_ENDPOINTS } from './products-endpoint'
+import { PRODUCTS_QUERY_KEY } from './query-keys'
 
 export function useProducts(filters: TypeProductsFilters = {}): {
 	products: IProduct[] | undefined
@@ -36,7 +36,7 @@ export function useConsumeProduct(): {
 
 	const { mutate: consume, isPending } = useMutation<IProduct, Error, string>(
 		{
-			mutationKey: ['products', 'consume'],
+			mutationKey: [...PRODUCTS_QUERY_KEY, 'consume'],
 			mutationFn: id =>
 				api.delete<IProduct>(PRODUCTS_ENDPOINTS.consume(id)),
 			onSuccess: () =>

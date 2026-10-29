@@ -2,12 +2,13 @@
 
 import { useQuery } from '@tanstack/react-query'
 
-import { EXPIRING_SOON_DAYS, type IProduct } from '@/entities/product'
 import { api } from '@/shared'
 
-import { PRODUCTS_ENDPOINTS } from './products-endpoint'
+import { EXPIRING_SOON_DAYS } from '../model/product.constants'
+import { type IProduct } from '../model/product.types'
 
-const PRODUCTS_QUERY_KEY = ['products'] as const
+import { PRODUCTS_ENDPOINTS } from './products-endpoint'
+import { PRODUCTS_QUERY_KEY } from './query-keys'
 
 export function useExpiringProducts(days: number = EXPIRING_SOON_DAYS): {
 	expiringProducts: IProduct[] | undefined

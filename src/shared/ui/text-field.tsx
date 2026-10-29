@@ -8,7 +8,9 @@ import {
 	type Path
 } from 'react-hook-form'
 
-import { cn, Field, FieldError, FieldLabel, Input } from '@/shared'
+import { cn } from '../lib/clsx'
+import { Field, FieldError, FieldLabel } from './field'
+import { Input } from './input'
 
 interface TextFieldProps<T extends FieldValues> {
 	name: Path<T>

@@ -26,6 +26,7 @@ export function BottomNav(): ReactElement {
 				className='-mt-12 size-15 flex-[0_0_auto] flex-col rounded-full bg-[linear-gradient(148deg,color-mix(in_oklab,var(--primary),var(--cream)_16%),var(--primary)_52%,color-mix(in_oklab,var(--primary),var(--coal)_22%))] data-active:[&_svg]:text-foreground'
 			>
 				<Scan className='size-6 text-background' />
+				<span className='sr-only'>Сканер</span>
 			</TabsTrigger>
 			<TabsTrigger value='list' className={tabTriggerClass}>
 				<div className='rounded-sm px-3 py-1.5'>

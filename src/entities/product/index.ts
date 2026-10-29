@@ -22,3 +22,6 @@ export type {
 	TypeProductBody,
 	TypeProductsFilters
 } from './model/product.types'
+export { PRODUCTS_ENDPOINTS } from './api/products-endpoint'
+export { useConsumeProduct, useProducts } from './api/use-products'
+export { useExpiringProducts } from './api/use-expiring-products'

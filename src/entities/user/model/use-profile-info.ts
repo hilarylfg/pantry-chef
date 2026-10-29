@@ -1,6 +1,9 @@
+'use client'
+
 import { useQuery } from '@tanstack/react-query'
 
-import { type IUser, userService } from '@/entities/user'
+import { userService } from '../api/user.service'
+import { type IUser } from '../model/user.types'
 
 const PROFILE_QUERY_KEY = ['profile']
 

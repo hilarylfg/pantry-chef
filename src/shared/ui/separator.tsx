@@ -3,7 +3,7 @@
 import { Separator as SeparatorPrimitive } from '@base-ui/react/separator'
 import * as React from 'react'
 
-import { cn } from '@/shared'
+import { cn } from '../lib/clsx'
 
 function Separator({
 	className,

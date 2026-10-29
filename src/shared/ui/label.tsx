@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { cn } from '@/shared'
+import { cn } from '../lib/clsx'
 
 function Label({
 	className,

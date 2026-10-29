@@ -2,6 +2,7 @@
 
 import {
 	MutationCache,
+	QueryCache,
 	QueryClient,
 	QueryClientProvider
 } from '@tanstack/react-query'
@@ -22,6 +23,9 @@ export function Providers({ children }: PropsWithChildren): ReactElement {
 						refetchOnWindowFocus: false
 					}
 				},
+				queryCache: new QueryCache({
+					onError: toastMessageHandler
+				}),
 				mutationCache: new MutationCache({
 					onError: toastMessageHandler
 				})

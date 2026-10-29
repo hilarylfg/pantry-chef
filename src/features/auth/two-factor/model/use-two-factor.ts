@@ -11,13 +11,21 @@ export function useTwoFactor(
 	email: string,
 	password: string
 ): {
-	verify: UseMutateFunction<IUser, Error, string>
+	verify: UseMutateFunction<{ user: IUser }, Error, string>
 	isPending: boolean
 } {
-	const { mutate: verify, isPending } = useMutation<IUser, Error, string>({
+	const { mutate: verify, isPending } = useMutation<
+		{ user: IUser },
+		Error,
+		string
+	>({
 		mutationKey: ['auth', 'two-factor'],
 		mutationFn: code =>
-			api.post<IUser>(AUTH_ENDPOINTS.login, { email, password, code })
+			api.post<{ user: IUser }>(AUTH_ENDPOINTS.login, {
+				email,
+				password,
+				code
+			})
 	})
 
 	return { verify, isPending }

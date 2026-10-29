@@ -9,6 +9,7 @@ import {
 	ScanLine
 } from 'lucide-react'
 
+import { useExpiringProducts, useProducts } from '@/entities/product'
 import { useRecommendationsRecipes } from '@/entities/recipe'
 import { useProfileInfo } from '@/entities/user'
 import { LogoLoader } from '@/features/loader'
@@ -17,11 +18,11 @@ import {
 	AvatarFallback,
 	AvatarImage,
 	Button,
+	pluralizeRu,
 	Tabs,
 	TabsContent
 } from '@/shared'
 import { BottomNav } from '@/widgets/bottom-nav'
-import { useExpiringProducts, useProducts } from '@/widgets/products'
 import { Profile } from '@/widgets/profile'
 
 export default function Page() {
@@ -57,39 +58,48 @@ export default function Page() {
 							</div>
 						</div>
 					)}
-					{expiringProducts && products && (
-						<div className='flex w-full gap-3 rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_88%)] p-4'>
-							<div className='my-auto flex size-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_76%)]'>
-								<ClockAlert className='size-5 text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]' />
-							</div>
-							<div className=''>
-								<p className='font-extrabold'>
-									{expiringProducts.length} продукта просят
-									внимания
-								</p>
-								<div className='flex gap-2'>
-									{expiringProducts
-										.slice(0, 1)
-										.map(product => (
-											<p
-												key={product.id}
-												className='w-fit rounded-lg border-border bg-surface px-2 py-1 text-[11px] font-bold text-muted-foreground'
-											>
-												{product.name}
+					{expiringProducts &&
+						products &&
+						expiringProducts?.length > 0 &&
+						products?.length > 0 && (
+							<div className='flex w-full gap-3 rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_88%)] p-4'>
+								<div className='my-auto flex size-10 items-center justify-center rounded-lg bg-[color-mix(in_oklab,var(--late),var(--surface)_76%)]'>
+									<ClockAlert className='size-5 text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]' />
+								</div>
+								<div>
+									<p className='font-extrabold'>
+										{expiringProducts.length}{' '}
+										{pluralizeRu(
+											expiringProducts.length,
+											'продукт просит',
+											'продукта просят',
+											'продуктов просят'
+										)}{' '}
+										внимания
+									</p>
+									<div className='flex gap-2'>
+										{expiringProducts
+											.slice(0, 1)
+											.map(product => (
+												<p
+													key={product.id}
+													className='w-fit rounded-lg border-border bg-surface px-2 py-1 text-[11px] font-bold text-muted-foreground'
+												>
+													{product.name}
+												</p>
+											))}
+										{expiringProducts.length > 1 && (
+											<p className='w-fit rounded-lg border-border bg-surface px-2 py-1 text-[11px] font-bold text-muted-foreground'>
+												{expiringProducts.length - 1}+
 											</p>
-										))}
-									{expiringProducts.length > 1 && (
-										<p className='w-fit rounded-lg border-border bg-surface px-2 py-1 text-[11px] font-bold text-muted-foreground'>
-											{expiringProducts.length - 1}+
-										</p>
-									)}
+										)}
+									</div>
+								</div>
+								<div className='ml-auto flex items-center'>
+									<ChevronRight className='size-4 text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]' />
 								</div>
 							</div>
-							<div className='ml-auto flex items-center'>
-								<ChevronRight className='size-4 text-[color-mix(in_oklab,var(--late),var(--foreground)_20%)]' />
-							</div>
-						</div>
-					)}
+						)}
 					<div className='flex gap-4'>
 						<div className='flex h-22.5 w-full flex-col items-center justify-center gap-1 rounded-lg border border-border bg-surface'>
 							<div className='flex size-10 items-center justify-center rounded-lg bg-accent-soft'>
@@ -159,6 +169,7 @@ export default function Page() {
 										<Button
 											variant='ghost'
 											className='px-1.5'
+											aria-label='Обновить подборку'
 										>
 											<RotateCw className='size-4' />
 										</Button>
@@ -175,16 +186,26 @@ export default function Page() {
 						<div className='mb-2 flex flex-col gap-3'>
 							<h2 className='text-2xl font-semibold'>Продукты</h2>
 							<span className='text-xs text-muted-foreground'>
-								24 продукта · обновлено сегодня
+								{products &&
+									pluralizeRu(
+										products.length,
+										'продукт',
+										'продукта',
+										'продуктов'
+									)}
 							</span>
 						</div>
-						<Button size='icon-lg' variant='secondary'>
+						<Button
+							size='icon-lg'
+							variant='secondary'
+							aria-label='Добавить продукт'
+						>
 							<Plus className='size-5' />
 						</Button>
 					</div>
 				</TabsContent>
-				<TabsContent value='scan'>52</TabsContent>
-				<TabsContent value='list'>52</TabsContent>
+				<TabsContent value='scan' />
+				<TabsContent value='list' />
 				<TabsContent
 					value='profile'
 					className='flex max-w-md min-w-0 flex-col gap-4 p-6 text-sm leading-loose'

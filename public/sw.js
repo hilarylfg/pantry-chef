@@ -1,7 +1,3 @@
-self.addEventListener('fetch', function (event) {
-	event.respondWith(fetch(event.request))
-})
-
 self.addEventListener('push', function (event) {
 	if (event.data) {
 		const data = event.data.json()
@@ -20,7 +16,6 @@ self.addEventListener('push', function (event) {
 })
 
 self.addEventListener('notificationclick', function (event) {
-	console.log('Notification click received.')
 	event.notification.close()
-	event.waitUntil(clients.openWindow('<https://localhost:3000>'))
+	event.waitUntil(clients.openWindow(self.registration.scope))
 })

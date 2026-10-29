@@ -1,5 +1,7 @@
-import { IUser, TypeSettingsSchema } from '@/entities/user'
 import { api } from '@/shared'
+
+import { type TypeSettingsSchema } from '../model/settings.schema'
+import { type IUser } from '../model/user.types'
 
 const PROFILE_ENDPOINT: string = 'users/me'
 

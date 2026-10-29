@@ -26,14 +26,14 @@
 
 | Категория | Технология |
 |---|---|
-| **Framework** | Next.js 16.2.6 (App Router, React Server Components) |
+| **Framework** | Next.js 16.2.6 (App Router, PWA) |
 | **UI-библиотека** | React 19.2.4 |
 | **Язык** | TypeScript 5 (strict) |
 | **Стилизация** | Tailwind CSS v4 (CSS-first, без JS-конфига) |
 | **UI-кит** | shadcn (стиль `base-nova`) на примитивах `@base-ui/react` |
 | **Иконки** | lucide-react, react-icons |
 | **Варианты классов** | class-variance-authority + clsx + tailwind-merge |
-| **Тематизация** | `@wrksz/themes` (системная тёмная/светлая, zero-flash SSR) |
+| **Тематизация** | `@teispace/next-themes` (системная тёмная/светлая, zero-flash SSR) |
 | **Серверное состояние** | TanStack React Query 5 |
 | **Формы и валидация** | react-hook-form + @hookform/resolvers + Zod |
 | **OTP / 2FA** | input-otp |
@@ -47,15 +47,16 @@
 
 ## Архитектура
 
-Проект построен по методологии **Feature-Sliced Design** поверх **Next.js App Router** с React Server Components. Каждый слой экспортирует публичный API через `index.ts`, а корректность импортов между слоями контролирует `eslint-plugin-fsd-lint`.
+Проект построен по методологии **Feature-Sliced Design** поверх **Next.js App Router**. Каждый слой экспортирует публичный API через `index.ts`, а корректность импортов между слоями контролирует `eslint-plugin-fsd-lint`.
 
 ```
 src/
-├── app/          # Маршруты App Router, layout, глобальные стили, manifest, Server Actions
+├── app/          # Маршруты App Router, layout, глобальные стили, manifest
 ├── entities/     # Бизнес-сущности (пользователь, продукты, рецепты …) — модели и API
-├── features/     # Пользовательские сценарии (аутентификация, сканирование, рецепты …)
+├── features/     # Пользовательские сценарии (аутентификация, push-уведомления через Server Actions …)
 ├── widgets/      # Композиция экранов из features и entities
-└── shared/       # UI-кит, дизайн-токены, утилиты, API-клиент
+├── shared/       # UI-кит, дизайн-токены, утилиты, API-клиент
+└── proxy.ts      # Auth-гейт запросов: проверка cookie-сессии (конвенция proxy в Next 16)
 ```
 
 UI-кит — shadcn в стиле `base-nova` на примитивах **`@base-ui/react`**. Дизайн-система описана в цветовом пространстве OKLch: тёплая мандариново-карамельная палитра на кремовом фоне и «тёплом угле» в тёмной теме, плюс доменные токены свежести продуктов — `--fresh`, `--soon`, `--late`.

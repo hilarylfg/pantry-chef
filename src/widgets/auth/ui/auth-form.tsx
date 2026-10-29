@@ -34,7 +34,9 @@ export function AuthForm(): ReactElement {
 			}
 		>
 			{mode === 'login' && <LoginForm onTwoFactor={startTwoFactor} />}
-			{mode === 'signup' && <SignupForm />}
+			{mode === 'signup' && (
+				<SignupForm onRegistered={() => setMode('login')} />
+			)}
 			{mode === '2fa' && credentials !== null && (
 				<TwoFactorForm {...credentials} />
 			)}

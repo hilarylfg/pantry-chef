@@ -5,7 +5,7 @@ export default function proxy(request: NextRequest) {
 
 	const session = cookies.get('pantry.sid')?.value
 
-	const isAuthPage = url.includes('/auth')
+	const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
 
 	if (isAuthPage) {
 		if (session) {

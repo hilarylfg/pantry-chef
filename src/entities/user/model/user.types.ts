@@ -16,18 +16,18 @@ export interface IAccount {
 	updatedAt: string
 	type: string
 	provider: string
-	refreshToken: string
-	accessToken: string
-	expiresAt: number
-	userId: string
+	providerAccountId: string
 }
 
+/**
+ * Публичный профиль — ровно то, что бэкенд отдаёт в users/me, auth/login
+ * и PATCH users/me: select без пароля и OAuth-токенов.
+ */
 export interface IUser {
 	id: string
 	createdAt: string
 	updatedAt: string
 	email: string
-	password: string
 	displayName: string
 	picture: string
 	role: UserRole

@@ -7,8 +7,10 @@ import {
 	useQueryClient
 } from '@tanstack/react-query'
 
-import { type IRecipe, IRecipeCard, RECIPES_ENDPOINTS } from '@/entities/recipe'
 import { api } from '@/shared'
+
+import { RECIPES_ENDPOINTS } from './recipe.endpoint'
+import { type IRecipe, type IRecipeCard } from './recipe.types'
 
 const RECIPES_QUERY_KEY = ['recipes'] as const
 const RECIPES_STALE_TIME = 5 * 60 * 1000
